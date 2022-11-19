@@ -27,7 +27,7 @@ handle_info({nodedown, _Node}, State) ->
     schedule_election(0),
     {noreply, State};
 handle_info(Msg, State) ->
-    logger:notice("Unexpected message received at elector: " ++ erlang:display(Msg)),
+    logger:notice("Unexpected message received at elector: " ++ io:format("~p~n", [Msg])),
     {noreply, State}.
 
 handle_call(Msg, _From, State) ->
