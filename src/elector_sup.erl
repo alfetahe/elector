@@ -16,9 +16,6 @@
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-%% sup_flags() = #{strategy => strategy(),         % optional
-%%                 intensity => non_neg_integer(), % optional
-%%                 period => pos_integer()}        % optional
 init([]) ->
     Elector = #{id => elector,       
                 start => {elector, start_link, []}},
@@ -28,5 +25,3 @@ init([]) ->
     ChildSpecs = [Elector],
 
     {ok, {SupFlags, ChildSpecs}}.
-
-%% internal functions
