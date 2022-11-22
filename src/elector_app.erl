@@ -26,5 +26,10 @@ validate() ->
                                           strategy_module,
                                           runtime_strategy),
     
-    %[{exports, items}] = Strategy_module:module_info(),    
+    attributes = Strategy_module:module_info(attributes),
+		behaviours = proplists:get_value(behaviour),
+
+		if 
+			lists:member(strategy_behaviour, behaviours) /= true ->
+				throw({strategy_implementation_error, "Strategy module must implement the base strategy behaviour"}),
     ok.
