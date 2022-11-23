@@ -6,15 +6,24 @@
 
 elect() ->
 	Nodes = rpc_client:connected_nodes(),
-	Runtimes = iterate(Nodes, #{}),
-	ok.
+	Runtimes = iterate_runtimes(Nodes, #{
+		node() => host_node_runtime()
+	}),
+	choose_leader(Runtimes).
 
-iterate([], Runtimes) ->
+iterate_runtimes([], Runtimes) ->
 	Runtimes;
-iterate[Node | Nbody], Runtimes) ->
-	Runtime = rpc_client:call(Node, test, test, []),
+iterate_runtimes[Node | Nbody], Runtimes) ->
+	{_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
 	Runtimes = maps:put(Node, Runtime, Runtimes),
 	iterate(Nbody, Runtimes).
 
+host_node_runtime() ->
+	{_, Runtime} = erlang:statistics(runtime),
+	Runtime
 
+choose_leader(Runtimes) ->
+	ok.
+
+	
 	
