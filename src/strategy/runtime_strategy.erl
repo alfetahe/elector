@@ -2,7 +2,19 @@
 
 -behaviour(strategy_behaviour).
 
--export([nodes_call/1]).
+-export([elect/0]).
 
-nodes_call(_Nodes_list) ->
-    ok.
+elect() ->
+	Nodes = rpc_client:connected_nodes(),
+	Runtimes = iterate(Nodes, #{}),
+	ok.
+
+iterate([], Runtimes) ->
+	Runtimes;
+iterate[Node | Nbody], Runtimes) ->
+	Runtime = rpc_client:call(Node, test, test, []),
+	Runtimes = maps:put(Node, Runtime, Runtimes),
+	iterate(Nbody, Runtimes).
+
+
+	
