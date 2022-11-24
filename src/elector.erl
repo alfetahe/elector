@@ -19,7 +19,14 @@ timer_check(State) ->
 		end.
 
 init(_) ->
+		Sync_start = application:get_env(elector, sync_start, false),
+		setup_init(Sync_start).
+
+setup_init(Sync_start) when Sync_start == false ->
     {ok, #{}, {continue, setup}}.
+setup_init(Sync_start) when Sync_start == true ->
+		do elect here sync
+		{ok, #{}}.
 
 handle_continue(setup, State) ->
     net_kernel:monitor_nodes(true),
