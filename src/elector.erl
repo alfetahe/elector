@@ -7,7 +7,16 @@ start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 schedule_election(Time) ->
-    erlang:send_after(Time, ?MODULE, election_schedule).
+    {ok, Timer_ref} = erlang:send_after(Time, ?MODULE, election_schedule),
+		Timer_ref.
+
+timer_check(State) ->
+		if 
+			maps:is_key(schedule_ref, State) /= true ->
+				maps:put(schedule_ref, schedule_election(0), State);
+		true ->
+			State
+		end.
 
 init(_) ->
     {ok, #{}, {continue, setup}}.
@@ -19,16 +28,25 @@ handle_continue(setup, State) ->
     {noreply, State}.
 
 handle_info(election_schedule, State) ->
+		strategy_behaviour:elect(),
+		State = maps:remove(schedule_election, State),
+
     {noreply, State};
+
 handle_info({nodeup, _Node}, State) ->
-    schedule_election(0),
+		State = timer_check(State),
+
     {noreply, State};
+
 handle_info({nodedown, _Node}, State) ->
-    schedule_election(0),
+    State = timer_check(State),
+
     {noreply, State};
+
 handle_info(Msg, State) ->
     logger:notice("Unexpected message received at elector: " ++ io:format("~p~n", [Msg])),
-    {noreply, State}.
+    
+		{noreply, State}.
 
 handle_call(Msg, _From, State) ->
     {ok, Msg, State}.
