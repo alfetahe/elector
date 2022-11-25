@@ -31,5 +31,7 @@ validate() ->
 
 		if 
 			lists:member(strategy_behaviour, behaviours) /= true ->
-				throw({strategy_implementation_error, "Strategy module must implement the base strategy behaviour"}),
+				throw({strategy_implementation_error, "Strategy module must implement the base strategy behaviour"})
+                
+        end,
     ok.
