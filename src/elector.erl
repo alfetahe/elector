@@ -17,8 +17,8 @@ schedule_election(State, Delay) ->
 		end.
 
 		if 
-			maps:is_key(schedule_ref, State) /= true ->
-				maps:put(schedule_ref, send_election_msg(Delay), State);
+			maps:is_key(schedule_election_ref, State) /= true ->
+				maps:put(schedule_election_ref, send_election_msg(Delay), State);
 		true ->
 			State
 		end.
@@ -30,12 +30,11 @@ init(_) ->
 setup_init(Sync_start) when Sync_start == false ->
     {ok, #{}, {continue, setup}}.
 setup_init(Sync_start) when Sync_start == true ->
-		do elect here sync
-		{ok, #{}}.
+		{ok, elect(#{})}.
 
 elect(State) ->
 		strategy_behaviour:elect(),
-		State = maps:remove(schedule_election, State),
+		State = maps:remove(schedule_election_ref, State),
 
 handle_continue(setup, State) ->
     net_kernel:monitor_nodes(true),
