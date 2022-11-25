@@ -6,14 +6,19 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
-schedule_election(Time) ->
-    {ok, Timer_ref} = erlang:send_after(Time, ?MODULE, election_schedule),
+send_election_msg(Delay) ->
+    {ok, Timer_ref} = erlang:send_after(Delay, ?MODULE, election_schedule),
 		Timer_ref.
 
-timer_check(State) ->
+schedule_election(State, Delay) ->
+		Delay = if 
+			is_integer(Delay) -> Delay;
+			true -> application.get_env(elector, election_delay, 5000)
+		end.
+
 		if 
 			maps:is_key(schedule_ref, State) /= true ->
-				maps:put(schedule_ref, schedule_election(0), State);
+				maps:put(schedule_ref, send_election_msg(Delay), State);
 		true ->
 			State
 		end.
@@ -28,27 +33,24 @@ setup_init(Sync_start) when Sync_start == true ->
 		do elect here sync
 		{ok, #{}}.
 
+elect(State) ->
+		strategy_behaviour:elect(),
+		State = maps:remove(schedule_election, State),
+
 handle_continue(setup, State) ->
     net_kernel:monitor_nodes(true),
-    schedule_election(5000),
+    schedule_election(State, nil),
 
     {noreply, State}.
 
 handle_info(election_schedule, State) ->
-		strategy_behaviour:elect(),
-		State = maps:remove(schedule_election, State),
-
-    {noreply, State};
+    {noreply, elect(State)};
 
 handle_info({nodeup, _Node}, State) ->
-		State = timer_check(State),
-
-    {noreply, State};
+    {noreply, schedule_election(State, nil};
 
 handle_info({nodedown, _Node}, State) ->
-    State = timer_check(State),
-
-    {noreply, State};
+    {noreply, schedule_election(State, nil)};
 
 handle_info(Msg, State) ->
     logger:notice("Unexpected message received at elector: " ++ io:format("~p~n", [Msg])),
