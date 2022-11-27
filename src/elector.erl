@@ -26,7 +26,7 @@ schedule_election(State, Delay) ->
     end.
 
 init(_) ->
-    Sync_start = application:get_env(elector, sync_start, false),
+    Sync_start = config_handler:get_sync_start(),
     setup_init(Sync_start).
 
 setup_init(Sync_start) when Sync_start =:= false ->
