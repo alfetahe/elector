@@ -9,15 +9,14 @@ host_node_runtime() ->
 	Runtime.
 
 choose_leader(Runtimes) ->
-	Fn = fun(_Node, Runtime, {_Highest_node, Highest_runtime} = Acc) -> 
+	Fn = fun(Node, Runtime, {_Highest_node, Highest_runtime} = Acc) -> 
 		if
-		Runtime >= Highest_runtime ->
-			Runtime;
-		true ->
-      		Acc	
+			Runtime >= Highest_runtime ->
+				{Node, Runtime};
+			true ->
+      			Acc	
 		end
 	end,
-
 	{Node, _Runtime} = maps:fold(Fn, {nil, 0}, Runtimes),
 	Node.
 

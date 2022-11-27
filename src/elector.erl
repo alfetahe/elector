@@ -7,11 +7,10 @@ start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 send_election_msg(Delay) ->
-    {ok, Timer_ref} = erlang:send_after(Delay, ?MODULE, election_schedule),
-    Timer_ref.
+    erlang:send_after(Delay, ?MODULE, election_schedule).
 
 schedule_election(State, Delay) ->
-    Delay = if 
+    Delay_val = if 
         is_integer(Delay) -> Delay;
         true -> config_handler:get_election_delay()
     end,
@@ -20,7 +19,7 @@ schedule_election(State, Delay) ->
 
     if 
         Election_timer_ref /= true ->
-            maps:put(schedule_election_ref, send_election_msg(Delay), State);
+            maps:put(schedule_election_ref, send_election_msg(Delay_val), State);
     true ->
         State
     end.
