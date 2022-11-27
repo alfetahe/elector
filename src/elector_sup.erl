@@ -17,11 +17,11 @@ start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 init([]) ->
-    Elector = #{id => elector,       
-                start => {elector, start_link, []}},
+    Election_worker = #{id => election_worker,       
+                start => {election_worker, start_link, []}},
     SupFlags = #{strategy => one_for_all,
                  intensity => 0,
                  period => 1},
-    ChildSpecs = [Elector],
+    ChildSpecs = [Election_worker],
 
     {ok, {SupFlags, ChildSpecs}}.
