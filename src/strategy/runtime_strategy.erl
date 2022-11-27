@@ -9,14 +9,16 @@ host_node_runtime() ->
 	Runtime.
 
 choose_leader(Runtimes) ->
-	{Node, Runtime} = maps:fold(fun(Node, Runtime, {Highest_node, Highest_runtime} = Acc) -> 
+	Fn = fun(_Node, Runtime, {_Highest_node, Highest_runtime} = Acc) -> 
 		if
 		Runtime >= Highest_runtime ->
 			Runtime;
 		true ->
       		Acc	
-		end,
-	{nil, 0}, Runtimes),
+		end
+	end,
+
+	{Node, _Runtime} = maps:fold(Fn, {nil, 0}, Runtimes),
 	Node.
 
 elect() ->
@@ -31,7 +33,7 @@ iterate_runtimes([], Runtimes) ->
 iterate_runtimes([Node | Nbody], Runtimes) ->
 	{_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
 	Runtimes = maps:put(Node, Runtime, Runtimes),
-	iterate(Nbody, Runtimes).
+	iterate_runtimes(Nbody, Runtimes).
 
 
 	
