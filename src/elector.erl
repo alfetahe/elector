@@ -8,33 +8,35 @@ start_link() ->
 
 send_election_msg(Delay) ->
     {ok, Timer_ref} = erlang:send_after(Delay, ?MODULE, election_schedule),
-		Timer_ref.
+    Timer_ref.
 
 schedule_election(State, Delay) ->
-		Delay = if 
-			is_integer(Delay) -> Delay;
-			true -> application.get_env(elector, election_delay, 5000)
-		end.
+    Delay = if 
+        is_integer(Delay) -> Delay;
+        true -> config_handler:get_election_delay()
+    end,
 
-		if 
-			maps:is_key(schedule_election_ref, State) /= true ->
-				maps:put(schedule_election_ref, send_election_msg(Delay), State);
-		true ->
-			State
-		end.
+    Election_timer_ref = maps:is_key(schedule_election_ref, State),
+
+    if 
+        Election_timer_ref /= true ->
+            maps:put(schedule_election_ref, send_election_msg(Delay), State);
+    true ->
+        State
+    end.
 
 init(_) ->
-		Sync_start = application:get_env(elector, sync_start, false),
-		setup_init(Sync_start).
+    Sync_start = application:get_env(elector, sync_start, false),
+    setup_init(Sync_start).
 
-setup_init(Sync_start) when Sync_start == false ->
-    {ok, #{}, {continue, setup}}.
-setup_init(Sync_start) when Sync_start == true ->
-		{ok, elect(#{})}.
+setup_init(Sync_start) when Sync_start =:= false ->
+    {ok, #{}, {continue, setup}};
+setup_init(Sync_start) when Sync_start =:= true ->
+    {ok, elect(#{})}.
 
 elect(State) ->
-		strategy_behaviour:elect(),
-		State = maps:remove(schedule_election_ref, State),
+    strategy_behaviour:elect(),
+    State = maps:remove(schedule_election_ref, State).
 
 handle_continue(setup, State) ->
     net_kernel:monitor_nodes(true),
@@ -46,7 +48,7 @@ handle_info(election_schedule, State) ->
     {noreply, elect(State)};
 
 handle_info({nodeup, _Node}, State) ->
-    {noreply, schedule_election(State, nil};
+    {noreply, schedule_election(State, nil)};
 
 handle_info({nodedown, _Node}, State) ->
     {noreply, schedule_election(State, nil)};
@@ -54,7 +56,7 @@ handle_info({nodedown, _Node}, State) ->
 handle_info(Msg, State) ->
     logger:notice("Unexpected message received at elector: " ++ io:format("~p~n", [Msg])),
     
-		{noreply, State}.
+    {noreply, State}.
 
 handle_call(Msg, _From, State) ->
     {ok, Msg, State}.

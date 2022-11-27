@@ -22,9 +22,7 @@ stop(_State) ->
 %%----------------------------------------------------------------------
 
 validate() ->
-    Strategy_module = application:get_env(elector, 
-                                          strategy_module,
-                                          runtime_strategy),
+    Strategy_module = config_handler:get_strategy_module(),
     
     attributes = Strategy_module:module_info(attributes),
 		Behaviours = proplists:get_value(behaviour),
