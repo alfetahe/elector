@@ -10,3 +10,9 @@ get_strategy_module() ->
 
 get_sync_start() ->
     application:get_env(elector, sync_start, false).
+
+pre_election_hooks() ->
+		application:get_env(elector, pre_election_hooks, []).
+
+post_election_hooks() ->
+		application:get_env(elector, post_election_hooks, []).
