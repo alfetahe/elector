@@ -1,4 +1,4 @@
-#1 Add is_leader public API function.
+#1 Add elect public api function.
 #2 Check if election logic is working.
 #4 Unit tests.
 #5 Document the options and the code. add typespecs.
