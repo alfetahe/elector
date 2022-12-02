@@ -35,9 +35,10 @@ setup_init(Sync_start) when Sync_start =:= true ->
 
 elect(State) ->
 		iterate_hooks(config_service:pre_election_hooks()),
-    strategy_behaviour:elect(),
+    LeaderNode = strategy_behaviour:elect(),
     State = maps:remove(schedule_election_ref, State),
-		iterate_hooks(config_service:post_election_hooks()).
+		iterate_hooks(config_service:post_election_hooks()),
+	maps:put(leader_node, LeaderNode, State).
 
 iterate_hooks([Hook | Hooks]) ->
 		erlang:apply(
@@ -69,6 +70,8 @@ handle_info(Msg, State) ->
     
     {noreply, State}.
 
+handle_call(get_leader, _From, State) ->
+	{ok, maps:get(leader_node, State), State);
 handle_call(Msg, _From, State) ->
     {ok, Msg, State}.
 
