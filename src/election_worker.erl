@@ -72,8 +72,12 @@ handle_info(Msg, State) ->
 
 handle_call(get_leader, _From, State) ->
 	{ok, maps:get(leader_node, State), State);
+handle_call(elect_sync, _From, State) ->
+	{ok, election_finished, elect(State));
 handle_call(Msg, _From, State) ->
     {ok, Msg, State}.
 
+handle_cast(elect_async, State) ->
+	{ok, elect(State);
 handle_cast(_msg, state) ->
     {ok, state}.
