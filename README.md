@@ -7,3 +7,5 @@
 ## Build the application:
 `rebar3 compile`
 
+## Run tests:
+`ct_run -dir test`
