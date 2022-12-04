@@ -1,0 +1,1 @@
+-module(config_handler_SUITE).

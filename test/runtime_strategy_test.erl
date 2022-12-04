@@ -1,1 +1,0 @@
--module(runtime_strategy_test).

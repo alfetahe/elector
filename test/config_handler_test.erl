@@ -1,1 +1,0 @@
--module(config_handler_test).

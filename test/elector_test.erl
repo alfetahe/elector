@@ -1,1 +1,0 @@
--module(elector_test).
