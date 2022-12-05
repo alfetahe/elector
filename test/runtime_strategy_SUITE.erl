@@ -6,4 +6,5 @@ host_node_runtime_test(_Config) ->
 	assert?(is_integer(Resp) and CurrRuntime =< Resp).
 
 elect_test(_Config) ->
-	runtime_strategy:elect(),
+	SelectedNode = runtime_strategy:elect(),
+	assert?(SelectedNode =:= node()).
