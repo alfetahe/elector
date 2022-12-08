@@ -4,10 +4,10 @@
 -compile(export_all).
 
 groups() ->
-	[{runtime_strategy_group, [], [elect_test, host_node_runtime_test}].
+	[{runtime_strategy_group, [], [elect_test, host_node_runtime_test]}].
 
 all() ->
-	[{group, runtime_strategy_group)}]
+	[{group, runtime_strategy_group}].
 
 suite() ->
 	{_, CurrRuntime} = erlang:statistics(runtime),
@@ -27,9 +27,9 @@ end_per_suite(_Config) ->
 	ok.
 
 host_node_runtime_test(_Config) ->
-	Resp = runtime_startegy:host_node_runtime(),
-	assert?(is_integer(Resp) and CurrRuntime =< Resp).
+	Resp = runtime_strategy:host_node_runtime(),
+	?assert(is_integer(Resp) and CurrRuntime =< Resp).
 
 elect_test(_Config) ->
 	SelectedNode = runtime_strategy:elect(),
-	assert?(SelectedNode =:= node()).
+	?assert(SelectedNode =:= node()).
