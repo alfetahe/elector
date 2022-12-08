@@ -8,4 +8,4 @@
 `rebar3 compile`
 
 ## Run tests:
-`ct_run -dir test -logdir test_logs`
+`ct_run -dir test -logdir test_logs -refresh_logs`
