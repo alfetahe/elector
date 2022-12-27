@@ -22,7 +22,7 @@ end_per_group(_GroupName, _Config) ->
 
 election_delay_test(_Config) ->
     application:set_env(elector, election_delay, 5000),
-	5000 = config_handler:election_delay().
+	config_handler:election_delay().
 	%?assert(config_handler:election_delay() == 5000).
 
 strategy_module() ->
