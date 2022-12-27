@@ -34,7 +34,7 @@ setup_init(Sync_start) when Sync_start =:= true ->
     {ok, elect(#{})}.
 
 elect(State) ->
-		iterate_hooks(config_handler:pre_election_hooks()),
+	iterate_hooks(config_handler:pre_election_hooks()),
     LeaderNode = strategy_behaviour:elect(),
     State = maps:remove(schedule_election_ref, State),
 		iterate_hooks(config_handler:post_election_hooks()),
@@ -48,7 +48,7 @@ iterate_hooks([Hook | Hooks]) ->
 		),
 		iterate_hooks(Hooks);
 iterate_hooks([]) ->
-		ok.
+	ok.
 
 handle_continue(setup, State) ->
     net_kernel:monitor_nodes(true),

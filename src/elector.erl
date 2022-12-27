@@ -1,4 +1,5 @@
 -module(elector).
+-export([is_leader/0, elect/0, elect_sync/0]).
 
 is_leader() ->
 	LeaderNode = gen_server:call(election_worker, get_leader),
