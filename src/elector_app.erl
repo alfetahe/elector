@@ -24,7 +24,7 @@ stop(_State) ->
 validate() ->
     Strategy_module = config_handler:strategy_module(),
     
-    Attributes = erlang:apply(Strategy_module, module_info, attributes),
+    Attributes = erlang:apply(Strategy_module, module_info, [attributes]),
     Behaviours = proplists:get_value(behaviour, Attributes),
     Is_strategy = lists:member(strategy_behaviour, Behaviours),
 
