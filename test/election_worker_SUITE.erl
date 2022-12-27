@@ -14,4 +14,4 @@ basic_test(_Config) ->
     ?assert(1 + 1 =:= 2).
 
 basic_fail_test(_Config) ->
-    ?assert(1 =:= 1).
+    ?assert(1 == 1).
