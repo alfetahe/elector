@@ -12,7 +12,7 @@ send_election_msg(Delay) ->
 schedule_election(State, Delay) ->
     Delay_val = if 
         is_integer(Delay) -> Delay;
-        true -> config_handler:get_election_delay()
+        true -> config_handler:election_delay()
     end,
 
     Election_timer_ref = maps:is_key(schedule_election_ref, State),
@@ -25,7 +25,7 @@ schedule_election(State, Delay) ->
     end.
 
 init(_) ->
-    Sync_start = config_handler:get_sync_start(),
+    Sync_start = config_handler:sync_start(),
     setup_init(Sync_start).
 
 setup_init(Sync_start) when Sync_start =:= false ->
@@ -34,10 +34,10 @@ setup_init(Sync_start) when Sync_start =:= true ->
     {ok, elect(#{})}.
 
 elect(State) ->
-		iterate_hooks(config_service:pre_election_hooks()),
+		iterate_hooks(config_handler:pre_election_hooks()),
     LeaderNode = strategy_behaviour:elect(),
     State = maps:remove(schedule_election_ref, State),
-		iterate_hooks(config_service:post_election_hooks()),
+		iterate_hooks(config_handler:post_election_hooks()),
 	maps:put(leader_node, LeaderNode, State).
 
 iterate_hooks([Hook | Hooks]) ->
@@ -71,13 +71,13 @@ handle_info(Msg, State) ->
     {noreply, State}.
 
 handle_call(get_leader, _From, State) ->
-	{ok, maps:get(leader_node, State), State);
+	{ok, maps:get(leader_node, State), State};
 handle_call(elect_sync, _From, State) ->
-	{ok, election_finished, elect(State));
+	{ok, election_finished, elect(State)};
 handle_call(Msg, _From, State) ->
     {ok, Msg, State}.
 
 handle_cast(elect_async, State) ->
-	{ok, elect(State);
+	{ok, elect(State)};
 handle_cast(_msg, state) ->
     {ok, state}.

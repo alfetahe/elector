@@ -1,13 +1,16 @@
 -module(config_handler_SUITE).
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
--compile(export_all).
+-export([groups/0, all/0, init_per_group/2, end_per_group/2]).
 
 groups() ->
-	[{config_handler_group, [], [testidsiin]}].
+	[{config_handler_group, [], [election_delay_test]}].
 
 all() ->
 	[{group, config_handler_group}].
+
+init_per_group(_GroupName, Config) ->
+	Config.
 
 end_per_group(_GroupName, _Config) ->
 	application:set_env(elector, election_delay, 3000),

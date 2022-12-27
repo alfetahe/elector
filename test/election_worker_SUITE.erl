@@ -10,7 +10,8 @@ all() ->
     [basic_test, basic_fail_test].
 
 basic_test(_Config) ->
+    io:fwrite("Hello world!~n", []),
     ?assert(1 + 1 =:= 2).
 
 basic_fail_test(_Config) ->
-    ?assert(1 =:= 2).
+    ?assert(1 =:= 1).

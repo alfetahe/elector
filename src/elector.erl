@@ -1,8 +1,8 @@
 -module(elector).
 
-is_leader?() ->
+is_leader() ->
 	LeaderNode = gen_server:call(election_worker, get_leader),
-	LeaderNode =.= node().
+	LeaderNode == node().
 
 elect() ->
 	gen_server:cast(election_worker, elect_async),
