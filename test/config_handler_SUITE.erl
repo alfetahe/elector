@@ -35,12 +35,27 @@ test_sync_start(_Config) ->
 
 test_pre_election_hooks(_Config) ->
 	application:set_env(elector, pre_election_hooks, test_hook(pre)),
-	
+	elector.elect_sync(),
 	Cond1 = config_handler:pre_election_hooks() == test_hook(pre),
+	Cond2 = receive
+		trigger_type(pre) -> 
+			true
+	after
+		2000 -> false
+	end,
+	Cond1 == true andalso Cond2 == true.
 
 test_post_election_hooks(_Config) ->
 	application:set_env(elector, post_election_hooks, test_hook(post)),
-	config_handler:post_election_hooks() == test_hook(post).
+	elector.elect_sync(),
+	Cond1 = config_handler:post_election_hooks() == test_hook(post),
+	Cond2 = receive
+		trigger_type(post) -> 
+			true
+	after
+		2000 -> false
+	end,
+	Cond1 == true andalso Cond2 == true.
 
 test_hook_trigger(Type) ->
 	erlang:send(self(), trigger_type(Type)).
