@@ -1,10 +1,7 @@
 -module(strategy_behaviour).
-
--type leader() :: node().
-
 -callback elect() -> Leader :: leader().
-
 -export([elect/0]).
+-type leader() :: node().
 
 elect() ->
 	Strategy_module = application:get_env(elector, strategy_module, runtime_strategy),

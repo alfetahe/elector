@@ -1,5 +1,4 @@
 -module(rpc_client).
-
 -export([call/4, connected_nodes/0]).
 
 call(Node, Module, Func, Args) ->
