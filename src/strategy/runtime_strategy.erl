@@ -1,7 +1,5 @@
 -module(runtime_strategy).
-
 -behaviour(strategy_behaviour).
-
 -export([elect/0, host_node_runtime/0]).
 
 host_node_runtime() ->

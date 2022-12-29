@@ -1,17 +1,21 @@
 -module(election_worker_SUITE).
-
--include_lib("eunit/include/eunit.hrl").
-
 -include_lib("common_test/include/ct.hrl").
+-export([groups/0, all/0, init_per_group/2, end_per_group/2]).
+-export([test_node_connecting/1]).
 
--compile(export_all).
+groups() ->
+	[{election_worker_group, [], [test_node_connecting]}].
 
 all() ->
-    [basic_test, basic_fail_test].
+	[{group, election_worker_group}].
 
-basic_test(_Config) ->
-    io:fwrite("Hello world!~n", []),
-    ?assert(1 + 1 =:= 2).
+init_per_group(_GroupName, Config) ->
+	Config.
 
-basic_fail_test(_Config) ->
-    ?assert(1 == 1).
+end_per_group(_GroupName, _Config) ->
+	ok.
+
+test_node_connecting(_Config) ->
+    % Connect child node to parent node. 
+	ok.
+
