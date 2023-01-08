@@ -8,7 +8,7 @@ strategy_module() ->
     application:get_env(elector, strategy_module, runtime_strategy).
 
 sync_start() ->
-    application:get_env(elector, sync_start, false).
+    application:get_env(elector, sync_start, true).
 
 pre_election_hooks() ->
     application:get_env(elector, pre_election_hooks, []).

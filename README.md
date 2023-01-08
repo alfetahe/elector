@@ -2,10 +2,10 @@
 
 ## Running the application:
 `rebar3 shell`
-`erl -pa ebin`
+`erl -pa ebin -pa ./_build/default/lib/elector`
 
 ## Build the application:
 `rebar3 compile`
 
 ## Run tests:
-`ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
+`rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`

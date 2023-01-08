@@ -34,21 +34,19 @@ setup_init(Sync_start) when Sync_start =:= true ->
     {ok, elect(#{})}.
 
 elect(State) ->
+    StrategyModule = config_handler:strategy_module(),
 	iterate_hooks(config_handler:pre_election_hooks()),
-    LeaderNode = strategy_behaviour:elect(),
+    LeaderNode = erlang:apply(StrategyModule, elect, []),
     State = maps:remove(schedule_election_ref, State),
-		iterate_hooks(config_handler:post_election_hooks()),
+    iterate_hooks(config_handler:post_election_hooks()),
 	maps:put(leader_node, LeaderNode, State).
 
-iterate_hooks([Hook | Hooks]) ->
-		erlang:apply(
-			maps:get(module, Hook),
-			maps:get(func, Hook),
-			maps:get(args, Hook, [])
-		),
-		iterate_hooks(Hooks);
 iterate_hooks([]) ->
-	ok.
+	ok;
+
+iterate_hooks([{Module, Func, Args} | Hooks]) ->
+    erlang:apply(Module, Func, Args),
+    iterate_hooks(Hooks).
 
 handle_continue(setup, State) ->
     net_kernel:monitor_nodes(true),
