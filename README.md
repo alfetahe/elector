@@ -9,3 +9,6 @@
 
 ## Run tests:
 `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
+
+## To debug in tests:
+`ct:pal("MyVar: ~p~n", [MyVar]).`

@@ -1,4 +1,5 @@
 -module(config_handler_SUITE).
+-include_lib("eunit/include/eunit.hrl").
 -export([groups/0, all/0, init_per_group/2, end_per_group/2]).
 -export([test_election_delay/1, test_strategy_module/1, test_sync_start/1,
 test_pre_election_hooks/1, test_post_election_hooks/1]).
@@ -24,44 +25,40 @@ end_per_group(_GroupName, _Config) ->
 
 test_election_delay(_Config) ->
     application:set_env(elector, election_delay, 5000),
-	config_handler:election_delay() == 5000.
+	?assert(config_handler:election_delay() =:= 5000).
 
 test_strategy_module(_Config) ->
     application:set_env(elector, strategy_module, runtime_strategy),
-	config_handler:strategy_module() == runtime_strategy.
+	?assert(config_handler:strategy_module() =:= runtime_strategy).
 
 test_sync_start(_Config) ->
     application:set_env(elector, sync_start, true),
-	config_handler:sync_start() == true.
+	?assert(config_handler:sync_start() =:= true).
 
 test_pre_election_hooks(_Config) ->
 	application:set_env(elector, pre_election_hooks, test_helper:test_hook(pre)),
-
 	elector:elect_sync(),
-	true.
-	% elector:elect_sync(),
-	% Cond1 = config_handler:pre_election_hooks() == test_hook(pre),
-	% TriggerType = trigger_type(pre),
-	% Cond2 = receive
-	% 	TriggerType -> 
-	% 		true
-	% after
-	% 	2000 -> false
-	% end,
-	% Cond1 == true andalso Cond2 == true.
+	Cond1 = config_handler:pre_election_hooks() =:= test_helper:test_hook(pre),
+	TriggerType = test_helper:trigger_type(pre),
+	Cond2 = receive
+		TriggerType -> 
+			true
+	after
+		2000 -> false
+	end,
+	?assert(Cond1 =:= true andalso Cond2 =:= true).
 
 test_post_election_hooks(_Config) ->
-	% application:set_env(elector, post_election_hooks, test_hook(post)),
-	% elector:elect_sync(),
-	% Cond1 = config_handler:post_election_hooks() == test_hook(post),
-	% TriggerType = trigger_type(post),
-	% Cond2 = receive
-	% 	TriggerType -> 
-	% 		true
-	% after
-	% 	2000 -> false
-	% end,
-	% Cond1 == true andalso Cond2 == true.
-	true.
+	application:set_env(elector, post_election_hooks, test_helper:test_hook(post)),
+	elector:elect_sync(),
+	Cond1 = config_handler:post_election_hooks() == test_helper:test_hook(post),
+	TriggerType = test_helper:trigger_type(post),
+	Cond2 = receive
+		TriggerType -> 
+			true
+	after
+		2000 -> false
+	end,
+	?assert(Cond1 =:= true andalso Cond2 =:= true).
 
 	
