@@ -35,10 +35,11 @@ test_sync_start(_Config) ->
 
 test_pre_election_hooks(_Config) ->
 	application:set_env(elector, pre_election_hooks, test_hook(pre)),
-	elector.elect_sync(),
+	elector:elect_sync(),
 	Cond1 = config_handler:pre_election_hooks() == test_hook(pre),
+	TriggerType = trigger_type(pre),
 	Cond2 = receive
-		trigger_type(pre) -> 
+		TriggerType -> 
 			true
 	after
 		2000 -> false
@@ -47,10 +48,11 @@ test_pre_election_hooks(_Config) ->
 
 test_post_election_hooks(_Config) ->
 	application:set_env(elector, post_election_hooks, test_hook(post)),
-	elector.elect_sync(),
+	elector:elect_sync(),
 	Cond1 = config_handler:post_election_hooks() == test_hook(post),
+	TriggerType = trigger_type(post),
 	Cond2 = receive
-		trigger_type(post) -> 
+		TriggerType -> 
 			true
 	after
 		2000 -> false
