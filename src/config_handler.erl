@@ -5,7 +5,7 @@ election_delay() ->
     application:get_env(elector, election_delay, 3000).
 
 strategy_module() ->
-    application:get_env(elector, strategy_module, runtime_strategy).
+    application:get_env(elector, strategy_module, runtime_high_strategy).
 
 sync_start() ->
     application:get_env(elector, sync_start, true).

@@ -4,5 +4,5 @@
 -type leader() :: node().
 
 elect() ->
-	Strategy_module = application:get_env(elector, strategy_module, runtime_strategy),
+	Strategy_module = application:get_env(elector, strategy_module, runtime_high_strategy),
 	erlang:apply(Strategy_module, elect, []).

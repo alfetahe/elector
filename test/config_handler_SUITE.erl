@@ -18,7 +18,7 @@ init_per_group(_GroupName, Config) ->
 
 end_per_group(_GroupName, _Config) ->
 	application:set_env(elector, election_delay, 3000),
-	application:set_env(elector, strategy_module, runtime_strategy),
+	application:set_env(elector, strategy_module, runtime_high_strategy),
 	application:set_env(elector, sync_start, false),
 	application:set_env(elector, pre_election_hooks, []),
 	application:set_env(elector, post_election_hooks, []).
@@ -28,8 +28,8 @@ test_election_delay(_Config) ->
 	?assert(config_handler:election_delay() =:= 5000).
 
 test_strategy_module(_Config) ->
-    application:set_env(elector, strategy_module, runtime_strategy),
-	?assert(config_handler:strategy_module() =:= runtime_strategy).
+    application:set_env(elector, strategy_module, runtime_high_strategy),
+	?assert(config_handler:strategy_module() =:= runtime_high_strategy).
 
 test_sync_start(_Config) ->
     application:set_env(elector, sync_start, true),
