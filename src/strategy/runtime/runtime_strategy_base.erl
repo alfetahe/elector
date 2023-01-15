@@ -1,12 +1,12 @@
 -module(runtime_strategy_base).
--export([elect/1, host_node_runtime/0, iterate_runtimes/2, choose_leader/2]).
+-export([elect/1, host_node_runtime/0]).
 
 elect(Type) ->
 	Nodes = rpc_client:connected_nodes(),
-	Runtimes = runtime_strategy_base:iterate_runtimes(Nodes, #{
-		node() => runtime_strategy_base:host_node_runtime()
+	Runtimes = iterate_runtimes(Nodes, #{
+		node() => host_node_runtime()
 	}),
-	runtime_strategy_base:choose_leader(Runtimes, Type).
+	choose_leader(Runtimes, Type).
 
 host_node_runtime() ->
 	{_, Runtime} = erlang:statistics(runtime),
@@ -15,10 +15,11 @@ host_node_runtime() ->
 choose_leader(Runtimes, Type) ->
 	Fn = fun(Node, Runtime, {_Iteration_node, Iteration_runtime} = Acc) -> 
 		if
-			Type =:= high  andalso Runtime >= Iteration_runtime orelse Type =:= low andalso Runtime =< Iteration_runtime ->
+			(Type =:= high andalso Runtime >= Iteration_runtime) orelse 
+			(Type =:= low andalso Runtime =< Iteration_runtime) ->
 				{Node, Runtime};
 			true ->
-      			Acc	
+      			Acc
 		end
 	end,
 	{Node, _Runtime} = maps:fold(Fn, {nil, 0}, Runtimes),
