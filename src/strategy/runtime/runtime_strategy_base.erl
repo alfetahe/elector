@@ -1,5 +1,5 @@
 -module(runtime_strategy_base).
--export([elect/1, host_node_runtime/0, choose_leader/2, iterate_runtimes/2]).
+-export([elect/1, host_node_runtime/0, iterate_runtimes/2, choose_leader/2]).
 
 elect(Type) ->
 	Nodes = rpc_client:connected_nodes(),

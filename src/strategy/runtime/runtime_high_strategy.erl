@@ -4,9 +4,3 @@
 
 elect() ->
 	runtime_strategy_base:elect(high).
-
-
-	
-
-	
-	

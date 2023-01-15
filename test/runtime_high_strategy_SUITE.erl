@@ -4,7 +4,7 @@
 -export([test_elect/1]).
 
 groups() ->
-	[{runtime_high_strategy_group, [], [test_host_node_runtime, test_elect]}].
+	[{runtime_high_strategy_group, [], [test_elect]}].
 
 all() ->
 	[{group, runtime_high_strategy_group}].
