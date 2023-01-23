@@ -12,7 +12,6 @@ all() ->
 init_per_testcase(_TestCase, Config) ->
 	Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
 	{ok, Peer, Node} = ?CT_PEER(Paths),
-	rpc:call(Node, application, set_env, [kernel, key, value]),
 	[{peer_node, {Peer, Node}} | Config].
 
 end_per_testcase(_TestCase, Config) ->

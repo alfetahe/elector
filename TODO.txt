@@ -4,6 +4,5 @@
 
 
 Testing
-1.1 Config handler still needs sync start test and delay tests.
-1.2 Use peer module to spawn child nodes and test rpc client.
-1.3 Use peer module to spawn child nodes and test runtime strategies.
+1.1 Test Elector
+1.2 Config handler still needs sync start test and delay tests.

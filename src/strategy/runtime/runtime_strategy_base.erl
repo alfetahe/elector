@@ -3,32 +3,37 @@
 
 elect(Type) ->
 	Nodes = rpc_client:connected_nodes(),
-	Runtimes = iterate_runtimes(Nodes, #{
-		node() => host_node_runtime()
-	}),
+	ExternalNodeRuntimes = iterate_runtimes(Nodes, #{}),
+	Runtimes = maps:put(node(), host_node_runtime(), ExternalNodeRuntimes),
 	choose_leader(Runtimes, Type).
 
 host_node_runtime() ->
-	{_, Runtime} = erlang:statistics(runtime),
+	{Runtime, _TimeSinceLastCall} = erlang:statistics(runtime),
 	Runtime.
 
 choose_leader(Runtimes, Type) ->
-	Fn = fun(Node, Runtime, {_Iteration_node, Iteration_runtime} = Acc) -> 
+	Fn = fun(Node, Runtime, {IterationNode, IterationRuntime} = CurrentlySelected) -> 
 		if
-			(Type =:= high andalso Runtime >= Iteration_runtime) orelse 
-			(Type =:= low andalso Runtime =< Iteration_runtime) ->
+			(IterationNode == nil) orelse
+			(Type =:= high andalso Runtime >= IterationRuntime) orelse 
+			(Type =:= low andalso Runtime =< IterationRuntime) ->
 				{Node, Runtime};
 			true ->
-      			Acc
+				CurrentlySelected
 		end
 	end,
+
 	{Node, _Runtime} = maps:fold(Fn, {nil, 0}, Runtimes),
 	Node.
 
-iterate_runtimes([], Runtimes) ->
-	Runtimes;
+iterate_runtimes([Node], Runtimes) ->
+	{_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
+	maps:put(Node, Runtime, Runtimes);
 
 iterate_runtimes([Node | Nbody], Runtimes) ->
 	{_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
 	Runtimes = maps:put(Node, Runtime, Runtimes),
-	iterate_runtimes(Nbody, Runtimes).
+	iterate_runtimes(Nbody, Runtimes);
+
+iterate_runtimes([], Runtimes) ->
+	Runtimes.
