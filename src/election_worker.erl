@@ -79,5 +79,6 @@ handle_call(Msg, _From, State) ->
 
 handle_cast(elect_async, State) ->
 	{noreply, elect(State)};
+
 handle_cast(_msg, state) ->
     {noreply, state}.

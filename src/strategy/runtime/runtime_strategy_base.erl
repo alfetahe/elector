@@ -12,18 +12,23 @@ host_node_runtime() ->
 	Runtime.
 
 choose_leader(Runtimes, Type) ->
-	Fn = fun(Node, Runtime, {IterationNode, IterationRuntime} = CurrentlySelected) -> 
+	CompareFn = fun(Node, Runtime, {AccNode, AccRuntime} = Acc) -> 
 		if
-			(IterationNode == nil) orelse
-			(Type =:= high andalso Runtime >= IterationRuntime) orelse 
-			(Type =:= low andalso Runtime =< IterationRuntime) ->
-				{Node, Runtime};
+			% No node name specified then set the first node as the leader.
+			(AccNode == nil) orelse
+			% If type is high then the node with the highest runtime is the leader.
+			(Type =:= high andalso Runtime > AccRuntime) orelse 
+			% If type is low then the node with the lowest runtime is the leader.
+			(Type =:= low andalso Runtime < AccRuntime) orelse 
+			% If runtime is the same then the node with the highest name is the leader.
+			(Runtime =:= AccRuntime andalso Node > AccNode) ->
+				{Node, Runtime};				
 			true ->
-				CurrentlySelected
+				Acc
 		end
 	end,
 
-	{Node, _Runtime} = maps:fold(Fn, {nil, 0}, Runtimes),
+	{Node, _Runtime} = maps:fold(CompareFn, {nil, 0}, Runtimes),
 	Node.
 
 iterate_runtimes([Node], Runtimes) ->

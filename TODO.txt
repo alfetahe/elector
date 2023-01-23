@@ -6,3 +6,4 @@
 Testing
 1.1 Test Elector
 1.2 Config handler still needs sync start test and delay tests.
+1.3 Runtime startegy should also check if nodes are having the same runtime and compare node names in that case as well.
