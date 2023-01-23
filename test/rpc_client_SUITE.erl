@@ -10,7 +10,9 @@ all() ->
 	[test_connected_nodes, test_call].
 
 init_per_testcase(_TestCase, Config) ->
-	{ok, Peer, Node} = ?CT_PEER(),
+	Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
+	{ok, Peer, Node} = ?CT_PEER(Paths),
+	rpc:call(Node, application, set_env, [kernel, key, value]),
 	[{peer_node, {Peer, Node}} | Config].
 
 end_per_testcase(_TestCase, Config) ->
@@ -24,7 +26,8 @@ test_connected_nodes(Config) ->
 	?assert(rpc_client:connected_nodes() =:= [Node, NewNode]),
 	peer:stop(NewPeer).
 
-test_call(_Config) ->
-	ok.
-
+test_call(Config) ->
+	{_Peer, Node} = ?config(peer_node, Config),
+	Resp = rpc_client:call(Node, test_helper, ping, []),
+	?assert(Resp =:= "pong").
 

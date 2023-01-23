@@ -5,9 +5,9 @@
 test_pre_election_hooks/1, test_post_election_hooks/1]).
 
 groups() ->
-	[{config_handler_group, [], [test_election_delay,
-	test_strategy_module, test_sync_start, test_pre_election_hooks,
-	test_post_election_hooks]}].
+	[{config_handler_group, [], 
+		[test_election_delay, test_strategy_module, test_sync_start,
+			test_pre_election_hooks, test_post_election_hooks]}].
 
 all() ->
 	[{group, config_handler_group}].
