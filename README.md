@@ -12,3 +12,6 @@
 
 ## To debug in tests:
 `ct:pal("MyVar: ~p~n", [MyVar]).`
+
+## Go inside the running docker container:
+`docker exec -it {CONTAINER-ID} bash`
