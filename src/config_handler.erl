@@ -1,5 +1,7 @@
 -module(config_handler).
--export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0, post_election_hooks/0]).
+
+-export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
+         post_election_hooks/0]).
 
 election_delay() ->
     application:get_env(elector, election_delay, 3000).

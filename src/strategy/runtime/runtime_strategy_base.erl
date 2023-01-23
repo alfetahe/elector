@@ -1,44 +1,39 @@
 -module(runtime_strategy_base).
+
 -export([elect/1, host_node_runtime/0]).
 
 elect(Type) ->
-	Nodes = rpc_client:connected_nodes(),
-	ExternalNodeRuntimes = iterate_runtimes(Nodes, #{}),
-	Runtimes = maps:put(node(), host_node_runtime(), ExternalNodeRuntimes),
-	choose_leader(Runtimes, Type).
+    Nodes = rpc_client:connected_nodes(),
+    ExternalNodeRuntimes = iterate_runtimes(Nodes, #{}),
+    Runtimes = maps:put(node(), host_node_runtime(), ExternalNodeRuntimes),
+    choose_leader(Runtimes, Type).
 
 host_node_runtime() ->
-	{Runtime, _TimeSinceLastCall} = erlang:statistics(runtime),
-	Runtime.
+    {Runtime, _TimeSinceLastCall} = erlang:statistics(runtime),
+    Runtime.
 
 choose_leader(Runtimes, Type) ->
-	CompareFn = fun(Node, Runtime, {AccNode, AccRuntime} = Acc) -> 
-		if
-			% No node name specified then set the first node as the leader.
-			(AccNode == nil) orelse
-			% If type is high then the node with the highest runtime is the leader.
-			(Type =:= high andalso Runtime > AccRuntime) orelse 
-			% If type is low then the node with the lowest runtime is the leader.
-			(Type =:= low andalso Runtime < AccRuntime) orelse 
-			% If runtime is the same then the node with the highest name is the leader.
-			(Runtime =:= AccRuntime andalso Node > AccNode) ->
-				{Node, Runtime};				
-			true ->
-				Acc
-		end
-	end,
+    CompareFn =
+        fun(Node, Runtime, {AccNode, AccRuntime} = Acc) ->
+           if AccNode == nil
+              orelse Type =:= high andalso Runtime > AccRuntime
+              orelse Type =:= low andalso Runtime < AccRuntime
+              orelse Runtime =:= AccRuntime andalso Node > AccNode ->
+                  {Node, Runtime};
+              true ->
+                  Acc
+           end
+        end,
 
-	{Node, _Runtime} = maps:fold(CompareFn, {nil, 0}, Runtimes),
-	Node.
+    {Node, _Runtime} = maps:fold(CompareFn, {nil, 0}, Runtimes),
+    Node.
 
 iterate_runtimes([Node], Runtimes) ->
-	{_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
-	maps:put(Node, Runtime, Runtimes);
-
+    {_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
+    maps:put(Node, Runtime, Runtimes);
 iterate_runtimes([Node | Nbody], Runtimes) ->
-	{_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
-	Runtimes = maps:put(Node, Runtime, Runtimes),
-	iterate_runtimes(Nbody, Runtimes);
-
+    {_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
+    Runtimes = maps:put(Node, Runtime, Runtimes),
+    iterate_runtimes(Nbody, Runtimes);
 iterate_runtimes([], Runtimes) ->
-	Runtimes.
+    Runtimes.
