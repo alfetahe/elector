@@ -1,23 +1,30 @@
 -module(rpc_client_SUITE).
 -include_lib("eunit/include/eunit.hrl").
--export([groups/0, all/0, init_per_group/2, end_per_group/2]).
+-include_lib("common_test/include/ct.hrl").
+-behaviour(ct_suite).
+-export([all/0]).
+-export([init_per_testcase/2, end_per_testcase/2]).
 -export([test_call/1, test_connected_nodes/1]).
 
-groups() ->
-	[{rpc_client_group, [], [test_call, test_connected_nodes]}].
+all() -> 
+	[test_connected_nodes, test_call].
 
-all() ->
-	[{group, rpc_client_group}].
+init_per_testcase(_TestCase, Config) ->
+	{ok, Peer, Node} = ?CT_PEER(),
+	[{peer_node, {Peer, Node}} | Config].
 
-init_per_group(_GroupName, Config) ->
-	application:ensure_start(elector),
-	Config.
+end_per_testcase(_TestCase, Config) ->
+	{Peer, _Node} = ?config(peer_node, Config),
+	peer:stop(Peer).
 
-end_per_group(_GroupName, _Config) ->
-	ok.
-
-test_connected_nodes(_Config) ->
-	ok.
+test_connected_nodes(Config) ->
+	{_Peer, Node} = ?config(peer_node, Config),
+	?assert(rpc_client:connected_nodes() =:= [Node]),
+	{ok, NewPeer, NewNode} = ?CT_PEER(),
+	?assert(rpc_client:connected_nodes() =:= [Node, NewNode]),
+	peer:stop(NewPeer).
 
 test_call(_Config) ->
 	ok.
+
+

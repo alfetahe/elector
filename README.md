@@ -2,7 +2,7 @@
 
 ## Running the application:
 `rebar3 shell`
-`erl -pa ebin -pa ./_build/default/lib/elector`
+`erl -sname local ebin -pa ./_build/default/lib/elector/ebin -eval "application:start(elector)"`
 
 ## Build the application:
 `rebar3 compile`
