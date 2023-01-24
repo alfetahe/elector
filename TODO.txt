@@ -1,3 +1,5 @@
 #1 Add function comments and typespecs.
 #2 Write readme file.
 #3 Publish the library.
+#4 Cant run tests inside docker container.
+#5 Refactor.
