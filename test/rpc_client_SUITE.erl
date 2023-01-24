@@ -7,10 +7,10 @@
 
 -export([all/0]).
 -export([init_per_testcase/2, end_per_testcase/2]).
--export([test_call/1, test_connected_nodes/1]).
+-export([test_call/1, test_nodes/1]).
 
 all() ->
-    [test_connected_nodes, test_call].
+    [test_nodes, test_call].
 
 init_per_testcase(_TestCase, Config) ->
     Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
@@ -21,11 +21,11 @@ end_per_testcase(_TestCase, Config) ->
     {Peer, _Node} = ?config(peer_node, Config),
     peer:stop(Peer).
 
-test_connected_nodes(Config) ->
+test_nodes(Config) ->
     {_Peer, Node} = ?config(peer_node, Config),
-    ?assert(rpc_client:connected_nodes() =:= [Node]),
+    ?assert(rpc_client:nodes() =:= [node(), Node]),
     {ok, NewPeer, NewNode} = ?CT_PEER(),
-    ?assert(rpc_client:connected_nodes() =:= [Node, NewNode]),
+    ?assert(rpc_client:nodes() =:= [node(), Node, NewNode]),
     peer:stop(NewPeer).
 
 test_call(Config) ->
