@@ -3,6 +3,7 @@ services:
   elector:
     image: 'erlang:24-alpine'
     tty: true
+    working_dir: '/elector'
     volumes:
       - '.:/elector'
       - '/tmp/.X11-unix:/tmp/.X11-unix' 

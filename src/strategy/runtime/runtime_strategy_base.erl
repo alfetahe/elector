@@ -29,10 +29,8 @@ choose_leader(Runtimes, Type) ->
 iterate_runtimes([Node], Runtimes) ->
     {Runtime, _} = rpc_client:call(Node, erlang, statistics, [runtime]),
     maps:put(Node, Runtime, Runtimes);
-
 iterate_runtimes([Node | Nbody], Runtimes) ->
     {Runtime, _} = rpc_client:call(Node, erlang, statistics, [runtime]),
     iterate_runtimes(Nbody, maps:put(Node, Runtime, Runtimes));
-
 iterate_runtimes([], Runtimes) ->
     Runtimes.

@@ -4,7 +4,7 @@
          post_election_hooks/0]).
 
 election_delay() ->
-    application:get_env(elector, election_delay, 500).
+    application:get_env(elector, election_delay, 3000).
 
 strategy_module() ->
     application:get_env(elector, strategy_module, runtime_high_strategy).
