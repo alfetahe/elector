@@ -1,5 +1,9 @@
 %%%-------------------------------------------------------------------
 %% @doc This is the main API module.
+%% 
+%% The elections are started automatically when new node joins the 
+%% cluster or old one leaves. It is possible to start an election
+%% manually by calling `elector:elect/0`.
 %% @end
 %%%-------------------------------------------------------------------
 -module(elector).
@@ -15,8 +19,7 @@
 %% @doc Returns boolean wether this node is the leader or not.
 -spec is_leader() -> boolean().
 is_leader() ->
-    LeaderNode = gen_server:call(election_worker, get_leader),
-    LeaderNode == node().
+    gen_server:call(election_worker, get_leader) =:= node().
 
 %% @doc Returns the current leader node's machine name.
 -spec get_leader() -> node().    

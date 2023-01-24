@@ -75,7 +75,7 @@ elect(State) ->
 iterate_hooks([]) ->
     ok;
 iterate_hooks([{Module, Func, Args} | Hooks]) ->
-    erlang:apply(Module, Func, Args),
+    spawn(erlang, apply, [Module, Func, Args]),
     iterate_hooks(Hooks).
 
 %% @private      
