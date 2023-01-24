@@ -4,8 +4,7 @@
 
 elect(Type) ->
     Nodes = rpc_client:connected_nodes(),
-    ExternalNodeRuntimes = iterate_runtimes(Nodes, #{}),
-    Runtimes = maps:put(node(), host_node_runtime(), ExternalNodeRuntimes),
+    Runtimes = iterate_runtimes(Nodes, #{node() => host_node_runtime()}),
     choose_leader(Runtimes, Type).
 
 host_node_runtime() ->
@@ -29,10 +28,10 @@ choose_leader(Runtimes, Type) ->
     Node.
 
 iterate_runtimes([Node], Runtimes) ->
-    {_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
+    {Runtime, _} = rpc_client:call(Node, erlang, statistics, [runtime]),
     maps:put(Node, Runtime, Runtimes);
 iterate_runtimes([Node | Nbody], Runtimes) ->
-    {_, Runtime} = rpc_client:call(Node, erlang, statistics, [runtime]),
+    {Runtime, _} = rpc_client:call(Node, erlang, statistics, [runtime]),
     Runtimes = maps:put(Node, Runtime, Runtimes),
     iterate_runtimes(Nbody, Runtimes);
 iterate_runtimes([], Runtimes) ->
