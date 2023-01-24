@@ -23,24 +23,24 @@ end_per_suite(_Config) ->
     ok.
 
 test_is_leader(_Config) ->
-    ?assert(elector:is_leader()),
+    ?assert(elector:is_leader() =:= {ok, true}),
     {ok, Peer, _Node} = peer_node_setup(),
     elector:elect_sync(),
-    ?assert(elector:is_leader() =:= false),
+    ?assert(elector:is_leader() =:= {ok, false}),
     peer_node_teardown(Peer).
 
 test_get_leader(_Config) ->
-    ?assert(elector:get_leader() =:= node()),
+    ?assert(elector:get_leader() =:= {ok, node()}),
     {ok, Peer, Node} = peer_node_setup(),
     elector:elect_sync(),
-    ?assert(elector:get_leader() =:= Node),
+    ?assert(elector:get_leader() =:= {ok, Node}),
     peer_node_teardown(Peer).
 
 test_elect_sync(_Config) ->
-    ?assert(elector:elect_sync() =:= election_finished).    
+    ?assert(elector:elect_sync() =:= {ok, election_finished}).    
 
 test_elect(_Config) ->
-    ?assert(elector:elect() =:= ok).    
+    ?assert(elector:elect() =:= {ok, election_started}).    
 
 peer_node_setup() ->
     Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
