@@ -24,4 +24,4 @@ test_hook_trigger(Type, Pid) ->
     erlang:send(Pid, trigger_type(Type)).
 
 ping() ->
-    "pong".
+    pong.

@@ -31,4 +31,4 @@ test_nodes(Config) ->
 test_call(Config) ->
     {_Peer, Node} = ?config(peer_node, Config),
     Resp = rpc_client:call(Node, test_helper, ping, []),
-    ?assert(Resp =:= "pong").
+    ?assert(Resp =:= pong).
