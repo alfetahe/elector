@@ -32,18 +32,24 @@ start_link() ->
 init(_) ->
     net_kernel:monitor_nodes(true),
     SyncStart = config_handler:sync_start(),
-    setup_init(SyncStart).
+    Opts = #{run_hooks => config_handler:startup_hooks_enabled()},
+    if SyncStart =:= true ->
+        {ok, elect(#{}, Opts)};
+    true ->
+        {ok, Opts, {continue, setup}}
+    end.
 
-handle_continue(setup, State) ->
-    schedule_election(State, nil),
-    {noreply, State}.
+handle_continue(setup, Opts) ->
+    NewOpts = maps:put(delay, nil, Opts),
+    schedule_election(#{}, NewOpts),
+    {noreply, #{}}.
 
 handle_info(election_schedule, State) ->
-    {noreply, elect(State)};
+    {noreply, elect(State, #{run_hooks => true})};
 handle_info({nodeup, _Node}, State) ->
-    {noreply, schedule_election(State, nil)};
+    {noreply, schedule_election(State, #{delay => nil})};
 handle_info({nodedown, _Node}, State) ->
-    {noreply, schedule_election(State, nil)};
+    {noreply, schedule_election(State, #{delay => nil})};
 handle_info(Msg, State) ->
     logger:notice("Unexpected message received at elector: " ++ io:format("~p", [Msg])),
     {noreply, State}.
@@ -51,12 +57,12 @@ handle_info(Msg, State) ->
 handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};
 handle_call(elect_sync, _From, State) ->
-    {reply, election_finished, elect(State)};
+    {reply, election_finished, elect(State, #{run_hooks => true})};
 handle_call(Msg, _From, State) ->
     {reply, Msg, State}.
 
 handle_cast(elect_async, State) ->
-    {noreply, elect(State)};
+    {noreply, elect(State, #{run_hooks => true})};
 handle_cast(_msg, state) ->
     {noreply, state}.
 
@@ -64,9 +70,9 @@ handle_cast(_msg, state) ->
 %% Internal functions
 %%--------------------------------------------------------------------    
 %% @private    
-elect(State) ->
+elect(State, Opts) ->
     StrategyModule = config_handler:strategy_module(),
-    ExecuteHooks = config_handler:startup_hooks_enabled(),
+    ExecuteHooks = maps:get(run_hooks, Opts),
     if ExecuteHooks =:= true ->
         iterate_hooks(config_handler:pre_election_hooks()),
         iterate_hooks(config_handler:post_election_hooks())
@@ -86,7 +92,7 @@ send_election_msg(Delay) ->
     erlang:send_after(Delay, ?MODULE, election_schedule).
 
 %% @private      
-schedule_election(State, Delay) ->
+schedule_election(State, #{delay := Delay}) ->
     DelayVal =
         if is_integer(Delay) ->
                 Delay;
@@ -101,9 +107,3 @@ schedule_election(State, Delay) ->
         true ->
             State
     end.
-
-%% @private  
-setup_init(SyncStart) when SyncStart =:= false ->
-    {ok, #{}, {continue, setup}};
-setup_init(SyncStart) when SyncStart =:= true ->
-    {ok, elect(#{})}.    
