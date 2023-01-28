@@ -1,5 +1,7 @@
 # Elector
 
+![example workflow](https://github.com/alfetahe/elector/actions/workflows/erlang.yml/badge.svg)
+
 ## Description
 Elector is Erlang application that automatically detects all nodes inside the Erlang cluster and choose the leader node.
 The election are started automatically when the Elector application is started or when node joins/leaves the cluster.
