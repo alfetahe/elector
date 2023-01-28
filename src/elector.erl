@@ -1,9 +1,18 @@
 %%%-------------------------------------------------------------------
 %% @doc This is the main API module.
 %% 
+%% This module can be used to manually start new election or to check
+%% if the current node is the leader. The `elector' application has
+%% to be started before calling any of these functions. To start the
+%% `elector' add it to your supervision tree or start it manually.
+%%
+%% When `elector' is started it will handle the elections automatically
+%% startup and when new node joins/leaves erlang the cluster.
 %% The elections are started automatically when new node joins the 
 %% cluster or old one leaves. It is possible to start an election
-%% manually by calling `elector:elect/0`.
+%% manually by calling `elector:elect/0' or `elect_sync/0'.
+%%
+%% See the README.md file for more information.
 %% @end
 %%%-------------------------------------------------------------------
 -module(elector).
@@ -16,7 +25,7 @@
 %%--------------------------------------------------------------------
 %% Exported functions
 %%--------------------------------------------------------------------
-%% @doc Returns boolean wether this node is the leader or not.
+%% @doc Returns boolean true this node is the leader or false if not.
 -spec is_leader() -> {ok, boolean()} | {error, leader_node_not_set}.
 is_leader() ->
     LeaderNode = gen_server:call(election_worker, get_leader),

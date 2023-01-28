@@ -16,11 +16,11 @@
 %% Exported functions
 %%--------------------------------------------------------------------
 %% @doc Returns the configured election delay.
-%% Default value is `3000` (3 seconds).
+%% Default value is `1000` (1 second).
 %% @end
 -spec election_delay() -> Delay :: integer().
 election_delay() ->
-    application:get_env(elector, election_delay, 3000).
+    application:get_env(elector, election_delay, 1000).
 
 %% @doc Returns the configured strategy module.
 %% Default value is `runtime_high_strategy` (Node with the highest runtime).

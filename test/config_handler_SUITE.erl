@@ -25,7 +25,7 @@ init_per_group(_GroupName, Config) ->
     Config.
 
 end_per_group(_GroupName, _Config) ->
-    application:set_env(elector, election_delay, 3000),
+    application:set_env(elector, election_delay, 1000),
     application:set_env(elector, strategy_module, runtime_high_strategy),
     application:set_env(elector, sync_start, false),
     application:set_env(elector, pre_election_hooks, []),

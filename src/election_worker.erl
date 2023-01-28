@@ -87,7 +87,7 @@ send_election_msg(Delay) ->
 
 %% @private      
 schedule_election(State, Delay) ->
-    Delay_val =
+    DelayVal =
         if is_integer(Delay) ->
                 Delay;
             true ->
@@ -97,13 +97,13 @@ schedule_election(State, Delay) ->
     ElectionTimerRef = maps:is_key(schedule_election_ref, State),
 
     if ElectionTimerRef /= true ->
-            maps:put(schedule_election_ref, send_election_msg(Delay_val), State);
+            maps:put(schedule_election_ref, send_election_msg(DelayVal), State);
         true ->
             State
     end.
 
 %% @private  
-setup_init(Sync_start) when Sync_start =:= false ->
+setup_init(SyncStart) when SyncStart =:= false ->
     {ok, #{}, {continue, setup}};
-setup_init(Sync_start) when Sync_start =:= true ->
+setup_init(SyncStart) when SyncStart =:= true ->
     {ok, elect(#{})}.    
