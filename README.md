@@ -3,8 +3,8 @@
 ![example workflow](https://github.com/alfetahe/elector/actions/workflows/erlang.yml/badge.svg)
 
 ## Description
-Elector is Erlang application that automatically detects all nodes inside the Erlang cluster and choose the leader node.
-The election are started automatically when the Elector application is started or when node joins/leaves the cluster.
+Elector is Erlang application that automatically detects all nodes inside the distributed Erlang cluster and choose the leader node.
+The election's are started automatically when the Elector application is started or when node joins/leaves the cluster.
 Elector also allows to run pre and post hooks that will be triggered when the election process is started and finished.
 
 The default election strategy is to choose the node with the highest runtime.
@@ -67,9 +67,11 @@ Erlang: `elector:elect_sync()` or `elector:elect()`
 
 See the `elector` module for more.
 
+https://hexdocs.pm/elector/
+
 ## For contributors:
 
-### Setup the elector locally and running the application:
+### Setup the elector locally and run the application:
 - `docker-compose up -d`
 - `docker exec -it elector_elector_1 sh`
 - `rebar3 compile`
