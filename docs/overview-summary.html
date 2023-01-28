@@ -38,6 +38,14 @@ Add <code>elector</code> to the deps in the <code>rebar.config</code> file: <cod
 Next start the <code>elector</code> inside your .app start function: <code>application:start(elector).</code>
 '''</p>
 
+
+<h3><a name="Start_election_manually">Start election manually</a></h3><p>
+Elixir: <code>:elector.elect_sync()</code> or <code>:elector.elect()</code></p>
+
+<p>Erlang: <code>elector:elect_sync()</code> or <code>elector:elect()</code></p>
+
+<p>See the <code>elector</code> module for more functions.</p>
+
 <h3><a name="Elector_supports_the_following_configurations:">Elector supports the following configurations:</a></h3>
 
 <p><code>election_delay</code> - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).</p>
