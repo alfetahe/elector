@@ -1,6 +1,6 @@
 {application,
  elector,
- [{description, "An OTP application"},
+ [{description, "Election library for Elixir & Erlang projects"},
   {vsn, "0.1.0"},
   {registered, []},
   {mod, {elector_app, []}},

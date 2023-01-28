@@ -33,11 +33,9 @@ Add <code>elector</code> under the extra_applications in the <code>mix.exs</code
     ]
   end</pre>
 
-<h3><a name="Installation_for_Elixir_application">Installation for Elixir application</a></h3><p>
+<h3><a name="Installation_for_Erlang_application">Installation for Erlang application</a></h3><p>
 Add <code>elector</code> to the deps in the <code>rebar.config</code> file: <code>{deps, [elector]}</code>.
-Next start the <code>elector</code> inside your .app start function: <code>application:start(elector).</code>
-'''</p>
-
+Next start the <code>elector</code> inside your .app start function: <code>application:start(elector).</code></p>
 
 <h3><a name="Guides">Guides</a></h3>
 
@@ -53,7 +51,6 @@ Elixir: <code>:elector.elect_sync()</code> or <code>:elector.elect()</code></p>
 
 <pre>&gt; elector:get_leader().
 {ok, example_node}</pre>
-
 
 <p>See the <code>elector</code> module for more.</p>
 

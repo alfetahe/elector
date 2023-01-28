@@ -21,17 +21,62 @@ a list of tuples with the following format: `{Module, Function, Args}`. Default 
 a list of tuples with the following format: `{Module, Function, Args}`. Default is `[]`.
 - `startup_hooks_enabled`- If true the `pre_election_hooks` and `post_election_hooks` will be triggered on startup. Default is `true`.
 
+## Guides
 
-# For contributors:
+### Installation for Elixir application
+Add `{:elector, "~> 1.0"}` under the deps in the `mix.exs` file: 
+```
+defp deps do
+    [
+        {:elector, "~> 1.0"}
+    ]
+end
+```
+Add `elector` under the extra_applications in the `mix.exs` file:
+```
+def application do
+    [
+        extra_applications: [:elector],
+        mod: {MyApp, []}
+    ]
+end
+```
 
-## Setup the elector locally and running the application:
-`docker-compose up -d`
-`docker exec -it {CONTAINER-ID} sh`
-`rebar3 compile`
-`erl -sname local -pa ./_build/default/lib/elector/ebin -eval "application:start(elector)"`
+### Installation for Erlang application
+Add `elector` to the deps in the `rebar.config` file: 
+- `{deps, [{elector, {git, "git://github.com/alfetahe/elector.git", {tag, "v0.1.0"}}}]}.`.
+- Next start the `elector` inside your .app start function: `application:start(elector).`
+'''
 
-## Run tests:
-`rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
+### Start election manually
+Elixir: `:elector.elect_sync()` or `:elector.elect()`
 
-## Generate documentation:
-`erl -noshell -run edoc_run files '["src/elector.erl"]' ' [{dir, "docs"}]'`
+Erlang: `elector:elect_sync()` or `elector:elect()`
+
+### Get current leader
+```
+> alias :elector, as Elector
+> Elector.get_leader()
+{:ok, :example_node}
+```
+
+```
+> elector:get_leader().
+{ok, example_node}
+```
+
+See the `elector` module for more.
+
+## For contributors:
+
+### Setup the elector locally and running the application:
+- `docker-compose up -d`
+- `docker exec -it elector_elector_1 sh`
+- `rebar3 compile`
+- `erl -sname local -pa ./_build/default/lib/elector/ebin -eval "application:start(elector)"`
+
+### Run tests:
+- `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
+
+### Generate documentation:
+- `erl -noshell -run edoc_run files '["src/elector.erl"]' ' [{dir, "docs"}]'`
