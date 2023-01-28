@@ -9,9 +9,7 @@ when the election process is started and finished.
 The default election strategy is to choose the node with the highest runtime.
 
 Elector supports the following configurations:
-- `election_delay` - The delay in milliseconds before the new election
-starts. This value is used automatic election is triggered either by
-node join/leave or startup. Default value is 1 second(1000).
+- `election_delay` - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).
 - `sync_start` - If true the election will start synchronously on start up. Set it `false` if start up should be async. Default is `true`.
 - `strategy_module` - The module that is used for the election strategy
 implementation. Default is `runtime_high_strategy` which chooses the node with the highest runtime.
@@ -33,3 +31,6 @@ a list of tuples with the following format: `{Module, Function, Args}`. Default 
 
 ## Run tests:
 `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
+
+## Generate documentation:
+`erl -noshell -run edoc_run files '["src/elector.erl"]' ' [{dir, "docs"}]'`
