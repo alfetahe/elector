@@ -1,0 +1,8 @@
+@author Anuar Alfetahe <anuar.alfetahe@gmail.com>
+@copyright 2023 Anuar Alfetahe
+@version 0.1.0
+@title Elector
+@doc Elector is Erlang application that automatically detects all nodes inside the Erlang cluster and choose the leader node.
+The election are started automatically when the Elector application is started or when node joins/leaves the cluster.
+Elector also allows to run pre and post hooks that will be triggered
+when the election process is started and finished.
