@@ -81,4 +81,4 @@ https://hexdocs.pm/elector/
 - `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
 
 ### Generate documentation:
-- `erl -noshell -run edoc_run files '["src/elector.erl"]' ' [{dir, "docs"}]'`
+- `erl -noshell -run edoc_run files '["src/elector.erl"]' '[{dir, "doc"}]'`
