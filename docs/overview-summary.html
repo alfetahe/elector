@@ -39,12 +39,24 @@ Next start the <code>elector</code> inside your .app start function: <code>appli
 '''</p>
 
 
-<h3><a name="Start_election_manually">Start election manually</a></h3><p>
+<h3><a name="Guides">Guides</a></h3>
+
+<h4><a name="Start_election_manually">Start election manually</a></h4><p>
 Elixir: <code>:elector.elect_sync()</code> or <code>:elector.elect()</code></p>
 
 <p>Erlang: <code>elector:elect_sync()</code> or <code>elector:elect()</code></p>
 
-<p>See the <code>elector</code> module for more functions.</p>
+<h4><a name="Get_current_leader">Get current leader</a></h4>
+<pre>&gt; alias :elector, as Elector
+&gt; Elector.get_leader()
+{:ok, :example_node}</pre>
+
+<pre>&gt; elector:get_leader().
+{ok, example_node}</pre>
+
+
+<p>See the <code>elector</code> module for more.</p>
+
 
 <h3><a name="Elector_supports_the_following_configurations:">Elector supports the following configurations:</a></h3>
 
@@ -54,9 +66,9 @@ Elixir: <code>:elector.elect_sync()</code> or <code>:elector.elect()</code></p>
 
 <p><code>strategy_module</code> - The module that is used for the election strategy implementation. Default is <code>runtime_high_strategy</code> which chooses the node with the highest runtime. Available options are: <code>runtime_high_strategy` and `runtime_low_strategy</code>. Feel free to write your own strategy module that implements the <code>strategy_behaviour</code> module.</p>
 
-<p><code>pre_election_hooks</code> - A list of hooks/function calls that will be triggered exactly before the node is starting the election. Expects a list of tuples with the following format: <code>{Module, Function, Args}</code>. Default is <code>[]</code>.</p>
+<p><code>pre_election_hooks</code> - A list of hooks/function calls that will be triggered before the node is starting the election. Expects a list of tuples with the following format: <code>{Module, Function, Args}</code>. Default is <code>[]</code>.</p>
 
-<p><code>post_election_hooks</code> - A list of hooks/function calls that will be triggered exactly after the election process. Expects a list of tuples with the following format: <code>{Module, Function, Args}</code>. Default is <code>[]</code>.</p>
+<p><code>post_election_hooks</code> - A list of hooks/function calls that will be triggered after the election process. Expects a list of tuples with the following format: <code>{Module, Function, Args}</code>. Default is <code>[]</code>.</p>
 
 <code>startup_hooks_enabled</code>- If true the <code>pre_election_hooks` and `post_election_hooks` will be triggered on startup. Default is `true</code>.
 <hr>

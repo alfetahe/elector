@@ -34,12 +34,28 @@ Next start the `elector' inside your .app start function: `application:start(ele
 '''
 
 
-==Start election manually==
+==Guides==
+
+===Start election manually===
 Elixir: `:elector.elect_sync()' or `:elector.elect()'
 
 Erlang: `elector:elect_sync()' or `elector:elect()'
 
-See the `elector' module for more functions.
+===Get current leader===
+```
+> alias :elector, as Elector
+> Elector.get_leader()
+{:ok, :example_node}
+'''
+
+```
+> elector:get_leader().
+{ok, example_node}
+'''
+
+
+See the `elector' module for more.
+
 
 ==Elector supports the following configurations:==
 
@@ -49,9 +65,9 @@ See the `elector' module for more functions.
 
 `strategy_module' - The module that is used for the election strategy implementation. Default is `runtime_high_strategy' which chooses the node with the highest runtime. Available options are: `runtime_high_strategy` and `runtime_low_strategy'. Feel free to write your own strategy module that implements the `strategy_behaviour' module.
 
-`pre_election_hooks' - A list of hooks/function calls that will be triggered exactly before the node is starting the election. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default is `[]'.
+`pre_election_hooks' - A list of hooks/function calls that will be triggered before the node is starting the election. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default is `[]'.
 
-`post_election_hooks' - A list of hooks/function calls that will be triggered exactly after the election process. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default is `[]'.
+`post_election_hooks' - A list of hooks/function calls that will be triggered after the election process. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default is `[]'.
 
 `startup_hooks_enabled'- If true the `pre_election_hooks` and `post_election_hooks` will be triggered on startup. Default is `true'.
 @end
