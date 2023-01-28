@@ -31,8 +31,8 @@ start_link() ->
 %%--------------------------------------------------------------------    
 init(_) ->
     net_kernel:monitor_nodes(true),
-    Sync_start = config_handler:sync_start(),
-    setup_init(Sync_start).
+    SyncStart = config_handler:sync_start(),
+    setup_init(SyncStart).
 
 handle_continue(setup, State) ->
     schedule_election(State, nil),
@@ -66,8 +66,11 @@ handle_cast(_msg, state) ->
 %% @private    
 elect(State) ->
     StrategyModule = config_handler:strategy_module(),
-    iterate_hooks(config_handler:pre_election_hooks()),
-    iterate_hooks(config_handler:post_election_hooks()),
+    ExecuteHooks = config_handler:startup_hooks_enabled(),
+    if ExecuteHooks =:= true ->
+        iterate_hooks(config_handler:pre_election_hooks()),
+        iterate_hooks(config_handler:post_election_hooks())
+    end,
     LeaderNode = erlang:apply(StrategyModule, elect, []),
     maps:put(leader_node, LeaderNode, maps:remove(schedule_election_ref, State)).
 
