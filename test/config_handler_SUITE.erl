@@ -4,7 +4,8 @@
 
 -export([groups/0, all/0, init_per_group/2, end_per_group/2]).
 -export([test_election_delay/1, test_strategy_module/1, test_sync_start/1,
-         test_pre_election_hooks/1, test_post_election_hooks/1, test_startup_hooks_enabled/1]).
+         test_pre_election_hooks/1, test_post_election_hooks/1, 
+         test_startup_hooks_enabled/1, test_quorum_size/1]).
 
 groups() ->
     [{config_handler_group,
@@ -14,7 +15,8 @@ groups() ->
        test_sync_start,
        test_pre_election_hooks,
        test_post_election_hooks,
-       test_startup_hooks_enabled]}].
+       test_startup_hooks_enabled,
+       test_quorum_size]}].
 
 all() ->
     [{group, config_handler_group}].
@@ -29,7 +31,8 @@ end_per_group(_GroupName, _Config) ->
     application:set_env(elector, sync_start, false),
     application:set_env(elector, pre_election_hooks, []),
     application:set_env(elector, startup_hooks_enabled, true),
-    application:set_env(elector, post_election_hooks, []).
+    application:set_env(elector, post_election_hooks, []),
+    application:set_env(elector, quorum_size, 1).
 
 test_election_delay(_Config) ->
     application:set_env(elector, election_delay, 5000),
@@ -74,3 +77,7 @@ test_post_election_hooks(_Config) ->
 test_startup_hooks_enabled(_Config) ->
     application:set_env(elector, startup_hooks_enabled, false),
     ?assert(config_handler:startup_hooks_enabled() =:= false).
+
+test_quorum_size(_Config) ->
+    application:set_env(elector, quorum_size, 2),
+    ?assert(config_handler:quorum_size() =:= 2).

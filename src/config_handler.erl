@@ -10,7 +10,7 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
-         post_election_hooks/0, startup_hooks_enabled/0]).
+         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -57,3 +57,11 @@ post_election_hooks() ->
 %% @end
 startup_hooks_enabled() ->
     application:get_env(elector, startup_hooks_enabled, true).
+
+%% @doc Returns the configured quorum size.
+%% This is the number of nodes that must be up and running
+%% in order to start an election.
+%% Default value is `1'.
+%% @end
+quorum_size() ->
+    application:get_env(elector, quorum_size, 1).
