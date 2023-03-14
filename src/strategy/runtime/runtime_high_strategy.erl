@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%% @doc Runtime strategy that elects the node with the highest 
+%% @doc Runtime strategy that elects the node with the highest
 %% runtime as leader.
 %% @end
 %%%-------------------------------------------------------------------

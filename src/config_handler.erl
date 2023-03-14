@@ -9,8 +9,8 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([election_delay/0, strategy_module/0, sync_start/0, 
-        pre_election_hooks/0, post_election_hooks/0, startup_hooks_enabled/0]).
+-export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
+         post_election_hooks/0, startup_hooks_enabled/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -51,9 +51,9 @@ post_election_hooks() ->
     application:get_env(elector, post_election_hooks, []).
 
 %% @doc Returns the configured startup hooks enabled flag.
-%% When turned off the post or pre election hooks will not 
+%% When turned off the post or pre election hooks will not
 %% be executed on the startup.
 %% Default value is `true'.
 %% @end
 startup_hooks_enabled() ->
-    application:get_env(elector, startup_hooks_enabled, true).    
+    application:get_env(elector, startup_hooks_enabled, true).

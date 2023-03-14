@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%% @doc Runtime strategy that elects the node with the lowest 
+%% @doc Runtime strategy that elects the node with the lowest
 %% runtime as leader.
 %% @end
 %%%-------------------------------------------------------------------

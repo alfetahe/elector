@@ -37,10 +37,10 @@ test_get_leader(_Config) ->
     peer_node_teardown(Peer).
 
 test_elect_sync(_Config) ->
-    ?assert(elector:elect_sync() =:= {ok, election_finished}).    
+    ?assert(elector:elect_sync() =:= {ok, election_finished}).
 
 test_elect(_Config) ->
-    ?assert(elector:elect() =:= {ok, election_started}).    
+    ?assert(elector:elect() =:= {ok, election_started}).
 
 peer_node_setup() ->
     Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),

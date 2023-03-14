@@ -28,15 +28,15 @@ start_link() ->
 
 %%--------------------------------------------------------------------
 %% Callback functions
-%%--------------------------------------------------------------------    
+%%--------------------------------------------------------------------
 init(_) ->
     net_kernel:monitor_nodes(true),
     SyncStart = config_handler:sync_start(),
     Opts = #{run_hooks => config_handler:startup_hooks_enabled()},
     if SyncStart =:= true ->
-        {ok, elect(#{}, Opts)};
-    true ->
-        {ok, Opts, {continue, setup}}
+           {ok, elect(#{}, Opts)};
+       true ->
+           {ok, Opts, {continue, setup}}
     end.
 
 handle_continue(setup, Opts) ->
@@ -68,42 +68,42 @@ handle_cast(_msg, state) ->
 
 %%--------------------------------------------------------------------
 %% Internal functions
-%%--------------------------------------------------------------------    
-%% @private    
+%%--------------------------------------------------------------------
+%% @private
 elect(State, Opts) ->
     StrategyModule = config_handler:strategy_module(),
     ExecuteHooks = maps:get(run_hooks, Opts),
     if ExecuteHooks =:= true ->
-        iterate_hooks(config_handler:pre_election_hooks()),
-        iterate_hooks(config_handler:post_election_hooks())
+           iterate_hooks(config_handler:pre_election_hooks()),
+           iterate_hooks(config_handler:post_election_hooks())
     end,
     LeaderNode = erlang:apply(StrategyModule, elect, []),
     maps:put(leader_node, LeaderNode, maps:remove(schedule_election_ref, State)).
 
-%% @private      
+%% @private
 iterate_hooks([]) ->
     ok;
 iterate_hooks([{Module, Func, Args} | Hooks]) ->
     spawn(erlang, apply, [Module, Func, Args]),
     iterate_hooks(Hooks).
 
-%% @private      
+%% @private
 send_election_msg(Delay) ->
     erlang:send_after(Delay, ?MODULE, election_schedule).
 
-%% @private      
+%% @private
 schedule_election(State, #{delay := Delay}) ->
     DelayVal =
         if is_integer(Delay) ->
-                Delay;
-            true ->
-                config_handler:election_delay()
+               Delay;
+           true ->
+               config_handler:election_delay()
         end,
 
     ElectionTimerRef = maps:is_key(schedule_election_ref, State),
 
     if ElectionTimerRef /= true ->
-            maps:put(schedule_election_ref, send_election_msg(DelayVal), State);
-        true ->
-            State
+           maps:put(schedule_election_ref, send_election_msg(DelayVal), State);
+       true ->
+           State
     end.

@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%% @doc Runtime strategy base functionality module used by the 
+%% @doc Runtime strategy base functionality module used by the
 %% high and low runtime strategies.
 %% @end
 %%%-------------------------------------------------------------------
@@ -19,7 +19,7 @@ elect(Type) ->
     Runtimes = iterate_runtimes(rpc_client:nodes(), #{}),
     choose_leader(Runtimes, Type).
 
-%% @doc Returns the runtime of the host node.    
+%% @doc Returns the runtime of the host node.
 -spec host_node_runtime() -> Runtime :: integer().
 host_node_runtime() ->
     {Runtime, _TimeSinceLastCall} = erlang:statistics(runtime),
@@ -27,7 +27,7 @@ host_node_runtime() ->
 
 %%--------------------------------------------------------------------
 %% Internal functions
-%%--------------------------------------------------------------------    
+%%--------------------------------------------------------------------
 %% @private
 choose_leader(Runtimes, Type) ->
     CompareFn =
@@ -45,7 +45,7 @@ choose_leader(Runtimes, Type) ->
     {Node, _Runtime} = maps:fold(CompareFn, {nil, 0}, Runtimes),
     Node.
 
-%% @private    
+%% @private
 iterate_runtimes([Node], Runtimes) ->
     {Runtime, _} = rpc_client:call(Node, erlang, statistics, [runtime]),
     maps:put(Node, Runtime, Runtimes);
