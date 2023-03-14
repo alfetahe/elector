@@ -7,4 +7,4 @@ services:
     user: 1000:1000
     volumes:
       - '.:/elector'
-      - '.cache/:/.cache'
+      - './cache/:/.cache'
