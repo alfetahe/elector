@@ -4,8 +4,7 @@ services:
     image: 'erlang:24-alpine'
     tty: true
     working_dir: '/elector'
+    user: 1000:1000
     volumes:
       - '.:/elector'
-      - '/tmp/.X11-unix:/tmp/.X11-unix' 
-    environment:
-      - DISPLAY
+      - '.cache/:/.cache'
