@@ -34,7 +34,7 @@ init(_) ->
     SyncStart = config_handler:sync_start(),
     Opts = #{run_hooks => config_handler:startup_hooks_enabled()},
     if SyncStart =:= true ->
-           {ok, elect(#{}, Opts)};
+           {ok, init_sync_state(Opts, quorum_check())};
        true ->
            {ok, Opts, {continue, setup}}
     end.
@@ -101,9 +101,25 @@ schedule_election(State, #{delay := Delay}) ->
         end,
 
     ElectionTimerRef = maps:is_key(schedule_election_ref, State),
-
-    if ElectionTimerRef /= true ->
+    QuorumCheck = quorum_check(),
+    if ElectionTimerRef /= true andalso QuorumCheck ->
            maps:put(schedule_election_ref, send_election_msg(DelayVal), State);
        true ->
            State
+    end.
+
+%% @private
+init_sync_state(Opts, QuorumCheck) when QuorumCheck == true ->
+    elect(#{}, Opts);
+init_sync_state(_Opts, _QuorumCheck) ->
+    #{leader_node => undefined}.
+
+%% @private
+quorum_check() ->
+    Quorum = config_handler:quorum_size(),
+    case Quorum of
+        undefined ->
+            true;
+        _ ->
+            Quorum =< length(rpc_client:nodes())
     end.
