@@ -20,7 +20,7 @@ a list of tuples with the following format: `{Module, Function, Args}`. Default 
 `post_election_hooks` - A list of hooks/function calls that will be triggered exactly after the election process. Expects
 a list of tuples with the following format: `{Module, Function, Args}`. Default is `[]`.
 - `startup_hooks_enabled`- If true the `pre_election_hooks` and `post_election_hooks` will be triggered on startup. Default is `true`.
-- `quorum_size` - The number of nodes that should be available in the cluster before the election process is started. This value is only checked before automatic election trigger including the startup and does not affect the manual election exection using `elect/0` or `elect_sync/0` Default is `1`.
+- `quorum_size` - The number of nodes(including the local node) that should be available in the cluster before the election process is started. Default is `1`. Do not set it to `0` as it will disable the election process, leave 1 if you want to run the election process even if there is only one node in the cluster.
 
 ## Guides
 

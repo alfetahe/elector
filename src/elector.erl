@@ -47,17 +47,27 @@ get_leader() ->
     end.
 
 %% @doc Starts an election asynchronously.
--spec elect() -> {ok, election_started}.
+-spec elect() -> {ok, election_started} | {error, quorum_size_not_met}.
 elect() ->
-    gen_server:cast(election_worker, elect_async),
-    {ok, election_started}.
+    case config_handler:quorum_check() of
+        true ->
+            gen_server:cast(electionworker, elect_async),
+            {ok, election_started};
+        false ->
+            {error, quorum_size_not_met}
+    end.
 
 %% @doc Starts an election synchronously.
 -spec elect_sync() -> {ok, election_finished} | {error, term()}.
 elect_sync() ->
-    Resp = gen_server:call(election_worker, elect_sync),
-    if Resp =:= election_finished ->
-           {ok, election_finished};
-       true ->
-           {error, Resp}
+    case config_handler:quorum_check() of
+        true ->
+            Resp = gen_server:call(election_worker, elect_sync),
+            if Resp =:= election_finished ->
+                   {ok, election_finished};
+               true ->
+                   {error, Resp}
+            end;
+        false ->
+            {error, quorum_size_not_met}
     end.

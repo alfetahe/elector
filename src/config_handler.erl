@@ -10,7 +10,7 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
-         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0]).
+         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0, quorum_check/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -55,6 +55,7 @@ post_election_hooks() ->
 %% be executed on the startup.
 %% Default value is `true'.
 %% @end
+-spec startup_hooks_enabled() -> StartupHooksEnabled :: boolean().
 startup_hooks_enabled() ->
     application:get_env(elector, startup_hooks_enabled, true).
 
@@ -63,5 +64,18 @@ startup_hooks_enabled() ->
 %% in order to start an election.
 %% Default value is `1'.
 %% @end
+-spec quorum_size() -> QuorumSize :: integer().
 quorum_size() ->
     application:get_env(elector, quorum_size, 1).
+
+%% @doc Returns boolean value indicating weather the quorum size
+%% is met or not.
+-spec quorum_check() -> QuorumCheck :: boolean().
+quorum_check() ->
+    Quorum = config_handler:quorum_size(),
+    case Quorum of
+        undefined ->
+            true;
+        _ ->
+            Quorum =< length(rpc_client:nodes())
+    end.
