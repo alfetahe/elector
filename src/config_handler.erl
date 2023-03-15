@@ -10,7 +10,8 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
-         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0, quorum_check/0]).
+         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0,
+         quorum_check/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -61,7 +62,7 @@ startup_hooks_enabled() ->
 
 %% @doc Returns the configured quorum size.
 %% This is the number of nodes that must be up and running
-%% in order to start an election.
+%% in order to start an election(including the local node).
 %% Default value is `1'.
 %% @end
 -spec quorum_size() -> QuorumSize :: integer().
@@ -79,3 +80,4 @@ quorum_check() ->
         _ ->
             Quorum =< length(rpc_client:nodes())
     end.
+

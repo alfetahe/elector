@@ -1,6 +1,9 @@
 -module(config_handler_SUITE).
 
 -include_lib("eunit/include/eunit.hrl").
+-include_lib("common_test/include/ct.hrl").
+
+-behaviour(ct_suite).
 
 -export([groups/0, all/0, init_per_group/2, end_per_group/2]).
 -export([test_election_delay/1, test_strategy_module/1, test_sync_start/1,
@@ -84,4 +87,11 @@ test_quorum_size(_Config) ->
     ?assert(config_handler:quorum_size() =:= 2).
 
 test_quorum_check(_Config) ->
-    ?assert(1 =:= 1).
+    application:set_env(elector, quorum_size, 1),
+    ?assert(config_handler:quorum_check()),
+    application:set_env(elector, quorum_size, 2),
+    ?assert(config_handler:quorum_check() =:= false),
+    Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
+    {ok, Peer, _Node} = ?CT_PEER(Paths),
+    ?assert(config_handler:quorum_check()),
+    peer:stop(Peer).
