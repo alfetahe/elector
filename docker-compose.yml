@@ -1,10 +1,12 @@
 version: "3"
 services: 
   elector:
-    image: 'erlang:24-alpine'
+    image: 'erlang:25-alpine'
     tty: true
     working_dir: '/elector'
     user: 1000:1000
     volumes:
       - '.:/elector'
       - './cache/:/.cache'
+    environment:
+      - 'ERL_AFLAGS=-enable-feature all'  

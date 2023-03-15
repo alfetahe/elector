@@ -10,8 +10,7 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
-         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0,
-         quorum_check/0]).
+         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0, quorum_check/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -80,4 +79,3 @@ quorum_check() ->
         _ ->
             Quorum =< length(rpc_client:nodes())
     end.
-

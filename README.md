@@ -79,7 +79,7 @@ https://hexdocs.pm/elector/
 - `erl -sname local -pa ./_build/default/lib/elector/ebin -eval "application:start(elector)"`
 
 ### Run tests:
-- `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin`
+- `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin -setcookie cookievalue`
 
 ### Generate documentation:
 - `erl -noshell -run edoc_run files '["src/elector.erl"]' '[{dir, "doc"}]'`
