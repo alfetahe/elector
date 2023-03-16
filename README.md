@@ -82,3 +82,4 @@ https://hexdocs.pm/elector/
 
 ### Generate documentation:
 - `erl -noshell -run edoc_run files '["src/elector.erl"]' '[{dir, "doc"}]'`
+- `rebar3 edoc`
