@@ -17,6 +17,7 @@
 %%--------------------------------------------------------------------
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, handle_continue/2]).
+-export([hook_exec/3]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -66,6 +67,14 @@ handle_cast(elect_async, State) ->
 handle_cast(_msg, state) ->
     {noreply, state}.
 
+
+%%--------------------------------------------------------------------
+%% API functions
+%%--------------------------------------------------------------------
+hook_exec({M,F,A}, Caller, Ref) ->
+	erlang:apply(M,F,A),
+  Caller ! {hook_executed, Ref}.
+
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
@@ -92,10 +101,6 @@ iterate_hooks([Mfa | Hooks]) ->
 			logger:error("Election hook timeout", []),
 		end
     iterate_hooks(Hooks).
-
-hook_exec({M,F,A}, Caller, Ref) ->
-	erlang:apply(M,F,A),
-  Caller ! {hook_executed, Ref}.
 
 %% @private
 send_election_msg(Delay) ->
