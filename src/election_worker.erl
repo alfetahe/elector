@@ -83,9 +83,19 @@ elect(State, Opts) ->
 %% @private
 iterate_hooks([]) ->
     ok;
-iterate_hooks([{Module, Func, Args} | Hooks]) ->
-    spawn(erlang, apply, [Module, Func, Args]),
+iterate_hooks([Mfa | Hooks]) ->
+		Ref = erlang:make_ref(),
+    spawn(?MODULE, hook_exec, [Mfa, self(), Ref]),
+		receive
+			{hook_executed, Ref} -> ok
+		after 3000 -> 
+			logger:error("Election hook timeout", []),
+		end
     iterate_hooks(Hooks).
+
+hook_exec({M,F,A}, Caller, Ref) ->
+	erlang:apply(M,F,A),
+  Caller ! {hook_executed, Ref}.
 
 %% @private
 send_election_msg(Delay) ->
