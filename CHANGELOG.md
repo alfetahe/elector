@@ -5,7 +5,7 @@
 
 ## v0.2.0 - 2023.03.16
 ### Update rebar.config deps list: 
-```{deps, [{elector, "2.0"}]}.```
+```{deps, [{elector, "0.2.0"}]}.```
 
 ### Added:
 - New configuration option `quorum_size` to set the minimum number of nodes that should be available in the cluster before the election process is started.

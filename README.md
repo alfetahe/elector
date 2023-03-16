@@ -3,9 +3,9 @@
 ![example workflow](https://github.com/alfetahe/elector/actions/workflows/erlang.yml/badge.svg)
 
 ## Description
-Elector is Erlang application that automatically detects all nodes inside the distributed Erlang cluster and choose the leader node.
-The election's are started automatically when the Elector application is started or when node joins/leaves the cluster.
-Elector also allows to run pre and post hooks that will be triggered when the election process is started and finished.
+Elector is an Erlang application that automatically detects all nodes inside the distributed Erlang cluster and chooses the leader node.
+The elections are started automatically when the Elector application is started or when a node joins or leaves the cluster.
+Elector also allows you to run pre- and post-election hooks that will be triggered when the election process is started and finished.
 
 The default election strategy is to choose the node with the highest runtime.
 
@@ -25,15 +25,15 @@ a list of tuples with the following format: `{Module, Function, Args}`. Default 
 ## Guides
 
 ### Installation for Elixir application
-Add `{:elector, "~> 1.0"}` under the deps in the `mix.exs` file: 
+- Add `{:elector, "~> 2.0"}` under the deps in the `mix.exs` file: 
 ```
 defp deps do
     [
-        {:elector, "~> 1.0"}
+        {:elector, "~> 2.0"}
     ]
 end
 ```
-Add `elector` under the extra_applications in the `mix.exs` file:
+- Add `elector` under the extra_applications in the `mix.exs` file:
 ```
 def application do
     [
@@ -44,14 +44,13 @@ end
 ```
 
 ### Installation for Erlang application
-Add `elector` to the deps in the `rebar.config` file: 
-- `{deps, [{elector, {git, "git://github.com/alfetahe/elector.git", {tag, "v0.1.0"}}}]}.`.
-- Next start the `elector` inside your .app start function: `application:start(elector).`
+- Add `elector` to the deps in the `rebar.config` file: `{deps, [{"elector", "0.2.0"}]}.`.
+- Add `elector` to the `applications` list in the `myapp.app.src` file: `{applications, [elector]}.`
+- Another option is to start the top level supervisor manually.
 '''
 
 ### Start election manually
 Elixir: `:elector.elect_sync()` or `:elector.elect()`
-
 Erlang: `elector:elect_sync()` or `elector:elect()`
 
 ### Get current leader
@@ -76,7 +75,7 @@ https://hexdocs.pm/elector/
 - `docker-compose up -d`
 - `docker exec -it elector_elector_1 sh`
 - `rebar3 compile`
-- `erl -sname local -pa ./_build/default/lib/elector/ebin -eval "application:start(elector)"`
+- `erl -sname local -setcookie cookievalue -pa ./_build/default/lib/elector/ebin -eval "application:start(elector)"`
 
 ### Run tests:
 - `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin -setcookie cookievalue`

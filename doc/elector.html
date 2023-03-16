@@ -38,7 +38,7 @@
 
 <h3 class="function"><a name="elect-0">elect/0</a></h3>
 <div class="spec">
-<p><tt>elect() -&gt; {ok, election_started}</tt><br></p>
+<p><tt>elect() -&gt; {ok, election_started} | {error, quorum_size_not_met}</tt><br></p>
 <p> </p>
 </div><p>Starts an election asynchronously.</p>
 
