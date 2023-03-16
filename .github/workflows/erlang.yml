@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: erlang:22.0.7
+      image: erlang:25.0
 
     steps:
     - uses: actions/checkout@v3
     - name: Compile
       run: rebar3 compile
     - name: Run tests
-      run: ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin
+      run: ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin -setcookie cookievalue
