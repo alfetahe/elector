@@ -46,8 +46,6 @@ end
 ### Installation for Erlang application
 - Add `elector` to the deps in the `rebar.config` file: `{deps, [{"elector", "0.2.0"}]}.`.
 - Add `elector` to the `applications` list in the `myapp.app.src` file: `{applications, [elector]}.`
-- Another option is to start the top level supervisor manually.
-'''
 
 ### Start election manually
 Elixir: `:elector.elect_sync()` or `:elector.elect()`
