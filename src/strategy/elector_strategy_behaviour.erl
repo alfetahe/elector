@@ -1,14 +1,13 @@
 %%%-------------------------------------------------------------------
-%% @doc Runtime strategy that elects the node with the highest
-%% runtime as leader.
+%% @doc Defines the base behaviour for election strategies.
 %% @end
 %%%-------------------------------------------------------------------
--module(runtime_high_strategy).
+-module(elector_strategy_behaviour).
 
 %%--------------------------------------------------------------------
-%% Behaviours
+%% Callbacks
 %%--------------------------------------------------------------------
--behaviour(strategy_behaviour).
+-callback elect() -> Leader :: leader().
 
 %%--------------------------------------------------------------------
 %% Exported API
@@ -16,9 +15,16 @@
 -export([elect/0]).
 
 %%--------------------------------------------------------------------
+%% Type definitions
+%%--------------------------------------------------------------------
+-type leader() :: node().
+
+%%--------------------------------------------------------------------
 %% Exported functions
 %%--------------------------------------------------------------------
-%% @doc Starts the election process.
--spec elect() -> Leader :: strategy_behaviour:leader().
+%% @doc Starts the election process by triggering the strategy
+%% modules elect() function.
+%% @end
 elect() ->
-    runtime_strategy_base:elect(high).
+    Strategy_module = application:get_env(elector, strategy_module, elector_rt_high_strategy),
+    erlang:apply(Strategy_module, elect, []).

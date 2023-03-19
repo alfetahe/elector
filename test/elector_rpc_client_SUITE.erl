@@ -1,4 +1,4 @@
--module(rpc_client_SUITE).
+-module(elector_rpc_client_SUITE).
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("common_test/include/ct.hrl").
@@ -23,12 +23,12 @@ end_per_testcase(_TestCase, Config) ->
 
 test_nodes(Config) ->
     {_Peer, Node} = ?config(peer_node, Config),
-    ?assert(rpc_client:nodes() =:= [node(), Node]),
+    ?assert(elector_rpc_client:nodes() =:= [node(), Node]),
     {ok, NewPeer, NewNode} = ?CT_PEER(),
-    ?assert(rpc_client:nodes() =:= [node(), Node, NewNode]),
+    ?assert(elector_rpc_client:nodes() =:= [node(), Node, NewNode]),
     peer:stop(NewPeer).
 
 test_call(Config) ->
     {_Peer, Node} = ?config(peer_node, Config),
-    Resp = rpc_client:call(Node, test_helper, ping, []),
+    Resp = elector_rpc_client:call(Node, elector_test_helper, ping, []),
     ?assert(Resp =:= pong).

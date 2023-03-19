@@ -1,8 +1,9 @@
 %%%-------------------------------------------------------------------
 %% @doc Rpc client module used for making distributed requests.
+%% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(rpc_client).
+-module(elector_rpc_client).
 
 %%--------------------------------------------------------------------
 %% Exported API

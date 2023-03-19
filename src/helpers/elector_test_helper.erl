@@ -1,4 +1,5 @@
--module(test_helper).
+%% @private
+-module(elector_test_helper).
 
 -export([test_pre_hook_trigger/1, test_post_hook_trigger/1, trigger_type/1, test_hook/1,
          ping/0]).

@@ -1,14 +1,15 @@
 %%%-------------------------------------------------------------------
 %% @doc Runtime strategy that elects the node with the lowest
 %% runtime as leader.
+%% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(runtime_low_strategy).
+-module(elector_rt_low_strategy).
 
 %%--------------------------------------------------------------------
 %% Behaviours
 %%--------------------------------------------------------------------
--behaviour(strategy_behaviour).
+-behaviour(elector_strategy_behaviour).
 
 %%--------------------------------------------------------------------
 %% Exported API
@@ -19,6 +20,6 @@
 %% Exported functions
 %%--------------------------------------------------------------------
 %% @doc Starts the election process.
--spec elect() -> Leader :: strategy_behaviour:leader().
+-spec elect() -> Leader :: elector_strategy_behaviour:leader().
 elect() ->
-    runtime_strategy_base:elect(low).
+    elector_rt_strategy_base:elect(low).

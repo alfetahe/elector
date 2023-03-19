@@ -1,5 +1,6 @@
 %%%-------------------------------------------------------------------
 %% @doc elector top level supervisor.
+%% @private
 %% @end
 %%%-------------------------------------------------------------------
 -module(elector_sup).
@@ -31,7 +32,7 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init([]) ->
-    ElectionWorker = #{id => election_worker, start => {election_worker, start_link, []}},
+    ElectionWorker = #{id => elector_worker, start => {elector_worker, start_link, []}},
     SupFlags =
         #{strategy => one_for_all,
           intensity => 0,

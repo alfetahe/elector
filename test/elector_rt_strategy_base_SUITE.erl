@@ -1,4 +1,4 @@
--module(runtime_strategy_base_SUITE).
+-module(elector_rt_strategy_base_SUITE).
 
 -include_lib("common_test/include/ct.hrl").
 
@@ -6,10 +6,10 @@
 -export([test_host_node_runtime/1]).
 
 groups() ->
-    [{runtime_strategy_base_group, [], [test_host_node_runtime]}].
+    [{elector_rt_strategy_base_group, [], [test_host_node_runtime]}].
 
 all() ->
-    [{group, runtime_strategy_base_group}].
+    [{group, elector_rt_strategy_base_group}].
 
 init_per_group(_GroupName, Config) ->
     {_, CurrRuntime} = erlang:statistics(runtime),
@@ -19,6 +19,6 @@ end_per_group(_GroupName, _Config) ->
     ok.
 
 test_host_node_runtime(Config) ->
-    Resp = runtime_strategy_base:host_node_runtime(),
+    Resp = elector_rt_strategy_base:host_node_runtime(),
     Runtime = ?config(curr_runtime, Config),
     is_integer(Resp) andalso Runtime =< Resp.

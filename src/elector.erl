@@ -28,7 +28,7 @@
 %% @doc Returns boolean true this node is the leader or false if not.
 -spec is_leader() -> {ok, boolean()} | {error, leader_node_not_set}.
 is_leader() ->
-    LeaderNode = gen_server:call(election_worker, get_leader),
+    LeaderNode = gen_server:call(elector_worker, get_leader),
     IsLeader = LeaderNode =:= node(),
     if is_atom(LeaderNode) ->
            {ok, IsLeader};
@@ -39,7 +39,7 @@ is_leader() ->
 %% @doc Returns the current leader node's machine name.
 -spec get_leader() -> {ok, node()} | {error, leader_node_not_set}.
 get_leader() ->
-    LeaderNode = gen_server:call(election_worker, get_leader),
+    LeaderNode = gen_server:call(elector_worker, get_leader),
     if is_atom(LeaderNode) ->
            {ok, LeaderNode};
        true ->
@@ -49,7 +49,7 @@ get_leader() ->
 %% @doc Starts an election asynchronously.
 -spec elect() -> {ok, election_started} | {error, quorum_size_not_met}.
 elect() ->
-    case config_handler:quorum_check() of
+    case elector_config_handler:quorum_check() of
         true ->
             gen_server:cast(electionworker, elect_async),
             {ok, election_started};
@@ -60,9 +60,9 @@ elect() ->
 %% @doc Starts an election synchronously.
 -spec elect_sync() -> {ok, election_finished} | {error, term()}.
 elect_sync() ->
-    case config_handler:quorum_check() of
+    case elector_config_handler:quorum_check() of
         true ->
-            Resp = gen_server:call(election_worker, elect_sync),
+            Resp = gen_server:call(elector_worker, elect_sync),
             if Resp =:= election_finished ->
                    {ok, election_finished};
                true ->

@@ -1,4 +1,4 @@
--module(runtime_low_strategy_SUITE).
+-module(elector_rt_low_strategy_SUITE).
 
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
@@ -23,5 +23,5 @@ end_per_testcase(_TestCase, Config) ->
 
 test_elect(Config) ->
     {_Peer, PeerNode} = ?config(peer_node, Config),
-    SelectedNode = runtime_low_strategy:elect(),
+    SelectedNode = elector_rt_low_strategy:elect(),
     ?assert(SelectedNode =:= PeerNode).

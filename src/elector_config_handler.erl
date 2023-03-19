@@ -2,9 +2,10 @@
 %% @doc Module responsible for handling configuration.
 %% These settings can be altered with custom settings in the
 %% application environment.
+%% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(config_handler).
+-module(elector_config_handler).
 
 %%--------------------------------------------------------------------
 %% Exported API
@@ -23,11 +24,11 @@ election_delay() ->
     application:get_env(elector, election_delay, 1000).
 
 %% @doc Returns the configured strategy module.
-%% Default value is `runtime_high_strategy' (Node with the highest runtime).
+%% Default value is `elector_rt_high_strategy' (Node with the highest runtime).
 %% @end
 -spec strategy_module() -> StrategyModule :: module().
 strategy_module() ->
-    application:get_env(elector, strategy_module, runtime_high_strategy).
+    application:get_env(elector, strategy_module, elector_rt_high_strategy).
 
 %% @doc Returns the configured sync_start flag.
 %% Default value is `true'.
@@ -72,10 +73,10 @@ quorum_size() ->
 %% is met or not.
 -spec quorum_check() -> QuorumCheck :: boolean().
 quorum_check() ->
-    Quorum = config_handler:quorum_size(),
+    Quorum = elector_config_handler:quorum_size(),
     case Quorum of
         undefined ->
             true;
         _ ->
-            Quorum =< length(rpc_client:nodes())
+            Quorum =< length(elector_rpc_client:nodes())
     end.

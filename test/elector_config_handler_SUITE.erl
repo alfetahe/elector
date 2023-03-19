@@ -1,4 +1,4 @@
--module(config_handler_SUITE).
+-module(elector_config_handler_SUITE).
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("common_test/include/ct.hrl").
@@ -11,7 +11,7 @@
          test_quorum_size/1, test_quorum_check/1]).
 
 groups() ->
-    [{config_handler_group,
+    [{elector_config_handler_group,
       [],
       [test_election_delay,
        test_strategy_module,
@@ -23,7 +23,7 @@ groups() ->
        test_quorum_check]}].
 
 all() ->
-    [{group, config_handler_group}].
+    [{group, elector_config_handler_group}].
 
 init_per_group(_GroupName, Config) ->
     application:ensure_started(elector),
@@ -31,7 +31,7 @@ init_per_group(_GroupName, Config) ->
 
 end_per_group(_GroupName, _Config) ->
     application:set_env(elector, election_delay, 1000),
-    application:set_env(elector, strategy_module, runtime_high_strategy),
+    application:set_env(elector, strategy_module, elector_rt_high_strategy),
     application:set_env(elector, sync_start, false),
     application:set_env(elector, pre_election_hooks, []),
     application:set_env(elector, startup_hooks_enabled, true),
@@ -40,21 +40,22 @@ end_per_group(_GroupName, _Config) ->
 
 test_election_delay(_Config) ->
     application:set_env(elector, election_delay, 5000),
-    ?assert(config_handler:election_delay() =:= 5000).
+    ?assert(elector_config_handler:election_delay() =:= 5000).
 
 test_strategy_module(_Config) ->
-    application:set_env(elector, strategy_module, runtime_high_strategy),
-    ?assert(config_handler:strategy_module() =:= runtime_high_strategy).
+    application:set_env(elector, strategy_module, elector_rt_high_strategy),
+    ?assert(elector_config_handler:strategy_module() =:= elector_rt_high_strategy).
 
 test_sync_start(_Config) ->
     application:set_env(elector, sync_start, true),
-    ?assert(config_handler:sync_start() =:= true).
+    ?assert(elector_config_handler:sync_start() =:= true).
 
 test_pre_election_hooks(_Config) ->
-    application:set_env(elector, pre_election_hooks, test_helper:test_hook(pre)),
+    application:set_env(elector, pre_election_hooks, elector_test_helper:test_hook(pre)),
     elector:elect_sync(),
-    Cond1 = config_handler:pre_election_hooks() =:= test_helper:test_hook(pre),
-    TriggerType = test_helper:trigger_type(pre),
+    Cond1 =
+        elector_config_handler:pre_election_hooks() =:= elector_test_helper:test_hook(pre),
+    TriggerType = elector_test_helper:trigger_type(pre),
     Cond2 =
         receive
             TriggerType ->
@@ -65,10 +66,11 @@ test_pre_election_hooks(_Config) ->
     ?assert(Cond1 =:= true andalso Cond2 =:= true).
 
 test_post_election_hooks(_Config) ->
-    application:set_env(elector, post_election_hooks, test_helper:test_hook(post)),
+    application:set_env(elector, post_election_hooks, elector_test_helper:test_hook(post)),
     elector:elect_sync(),
-    Cond1 = config_handler:post_election_hooks() == test_helper:test_hook(post),
-    TriggerType = test_helper:trigger_type(post),
+    Cond1 =
+        elector_config_handler:post_election_hooks() == elector_test_helper:test_hook(post),
+    TriggerType = elector_test_helper:trigger_type(post),
     Cond2 =
         receive
             TriggerType ->
@@ -80,18 +82,18 @@ test_post_election_hooks(_Config) ->
 
 test_startup_hooks_enabled(_Config) ->
     application:set_env(elector, startup_hooks_enabled, false),
-    ?assert(config_handler:startup_hooks_enabled() =:= false).
+    ?assert(elector_config_handler:startup_hooks_enabled() =:= false).
 
 test_quorum_size(_Config) ->
     application:set_env(elector, quorum_size, 2),
-    ?assert(config_handler:quorum_size() =:= 2).
+    ?assert(elector_config_handler:quorum_size() =:= 2).
 
 test_quorum_check(_Config) ->
     application:set_env(elector, quorum_size, 1),
-    ?assert(config_handler:quorum_check()),
+    ?assert(elector_config_handler:quorum_check()),
     application:set_env(elector, quorum_size, 2),
-    ?assert(config_handler:quorum_check() =:= false),
+    ?assert(elector_config_handler:quorum_check() =:= false),
     Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
     {ok, Peer, _Node} = ?CT_PEER(Paths),
-    ?assert(config_handler:quorum_check()),
+    ?assert(elector_config_handler:quorum_check()),
     peer:stop(Peer).

@@ -14,12 +14,12 @@ all() ->
 
 init_per_suite(Config) ->
     application:set_env(elector, election_delay, 0),
-    application:set_env(elector, strategy_module, runtime_low_strategy),
+    application:set_env(elector, strategy_module, elector_rt_low_strategy),
     Config.
 
 end_per_suite(_Config) ->
     application:set_env(elector, election_delay, 3000),
-    application:set_env(elector, strategy_module, runtime_high_strategy),
+    application:set_env(elector, strategy_module, elector_rt_high_strategy),
     ok.
 
 test_is_leader(_Config) ->

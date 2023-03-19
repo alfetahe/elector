@@ -3,9 +3,10 @@
 %% election process on start up either syncronously or asyncronously.
 %% Also sets up monitoring for node up and down events and triggers
 %% automatic election if a node goes down or comes up.
+%% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(election_worker).
+-module(elector_worker).
 
 %%--------------------------------------------------------------------
 %% Behaviours
@@ -32,10 +33,10 @@ start_link() ->
 %%--------------------------------------------------------------------
 init(_) ->
     net_kernel:monitor_nodes(true),
-    SyncStart = config_handler:sync_start(),
-    Opts = #{run_hooks => config_handler:startup_hooks_enabled()},
+    SyncStart = elector_config_handler:sync_start(),
+    Opts = #{run_hooks => elector_config_handler:startup_hooks_enabled()},
     if SyncStart =:= true ->
-           {ok, init_sync_state(Opts, config_handler:quorum_check())};
+           {ok, init_sync_state(Opts, elector_config_handler:quorum_check())};
        true ->
            {ok, Opts, {continue, setup}}
     end.
@@ -67,35 +68,35 @@ handle_cast(elect_async, State) ->
 handle_cast(_msg, state) ->
     {noreply, state}.
 
-
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
-hook_exec({M,F,A}, Caller, Ref) ->
-	erlang:apply(M,F,A),
-  Caller ! {hook_executed, Ref}.
+hook_exec({M, F, A}, Caller, Ref) ->
+    erlang:apply(M, F, A),
+    Caller ! {hook_executed, Ref}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
 %% @private
 elect(State, Opts) ->
-    StrategyModule = config_handler:strategy_module(),
+    StrategyModule = elector_config_handler:strategy_module(),
     ExecuteHooks = maps:get(run_hooks, Opts),
-    iterate_hooks(config_handler:pre_election_hooks(), ExecuteHooks),
+    iterate_hooks(elector_config_handler:pre_election_hooks(), ExecuteHooks),
     LeaderNode = erlang:apply(StrategyModule, elect, []),
-    iterate_hooks(config_handler:post_election_hooks(), ExecuteHooks),
+    iterate_hooks(elector_config_handler:post_election_hooks(), ExecuteHooks),
     maps:put(leader_node, LeaderNode, maps:remove(schedule_election_ref, State)).
 
 %% @private
 iterate_hooks([], _ExecuteHooks) ->
     ok;
 iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
-		Ref = erlang:make_ref(),
+    Ref = erlang:make_ref(),
     spawn(?MODULE, hook_exec, [Mfa, self(), Ref]),
     receive
-        {hook_executed, Ref} -> ok
-    after 3000 -> 
+        {hook_executed, Ref} ->
+            ok
+    after 3000 ->
         logger:error("Election hook timeout", [])
     end,
     iterate_hooks(Hooks, ExecuteHooks).
@@ -110,11 +111,11 @@ schedule_election(State, #{delay := Delay}) ->
         if is_integer(Delay) ->
                Delay;
            true ->
-               config_handler:election_delay()
+               elector_config_handler:election_delay()
         end,
 
     ElectionTimerRef = maps:is_key(schedule_election_ref, State),
-    QuorumCheck = config_handler:quorum_check(),
+    QuorumCheck = elector_config_handler:quorum_check(),
     if ElectionTimerRef /= true andalso QuorumCheck == true ->
            maps:put(schedule_election_ref, send_election_msg(DelayVal), State);
        true ->
