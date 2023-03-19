@@ -13,6 +13,7 @@ all() ->
     [test_is_leader, test_get_leader, test_elect_sync, test_elect].
 
 init_per_suite(Config) ->
+    application:ensure_all_started(elector),
     application:set_env(elector, election_delay, 0),
     application:set_env(elector, strategy_module, elector_rt_low_strategy),
     Config.
