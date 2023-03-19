@@ -6,6 +6,7 @@
 
 ### Changed:
 - Made post and pre election hooks synchronous
+- Updated github CI settings
 - Updated documentation
 
 ### Fixed:
