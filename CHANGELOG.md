@@ -10,6 +10,7 @@
 - Updated documentation
 
 ### Fixed:
+- Renamed modules to avoid collisions with other applications
 - Post election hooks were not running after the election fix
 
 
