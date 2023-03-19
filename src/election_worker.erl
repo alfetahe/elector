@@ -82,25 +82,23 @@ hook_exec({M,F,A}, Caller, Ref) ->
 elect(State, Opts) ->
     StrategyModule = config_handler:strategy_module(),
     ExecuteHooks = maps:get(run_hooks, Opts),
-    if ExecuteHooks =:= true ->
-           iterate_hooks(config_handler:pre_election_hooks()),
-           iterate_hooks(config_handler:post_election_hooks())
-    end,
+    iterate_hooks(config_handler:pre_election_hooks(), ExecuteHooks),
     LeaderNode = erlang:apply(StrategyModule, elect, []),
+    iterate_hooks(config_handler:post_election_hooks(), ExecuteHooks),
     maps:put(leader_node, LeaderNode, maps:remove(schedule_election_ref, State)).
 
 %% @private
-iterate_hooks([]) ->
+iterate_hooks([], _ExecuteHooks) ->
     ok;
-iterate_hooks([Mfa | Hooks]) ->
+iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
 		Ref = erlang:make_ref(),
     spawn(?MODULE, hook_exec, [Mfa, self(), Ref]),
-		receive
-			{hook_executed, Ref} -> ok
-		after 3000 -> 
-			logger:error("Election hook timeout", []),
-		end
-    iterate_hooks(Hooks).
+    receive
+        {hook_executed, Ref} -> ok
+    after 3000 -> 
+        logger:error("Election hook timeout", [])
+    end,
+    iterate_hooks(Hooks, ExecuteHooks).
 
 %% @private
 send_election_msg(Delay) ->

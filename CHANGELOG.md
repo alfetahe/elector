@@ -1,7 +1,16 @@
 # Change log
 
-## v0.1.1 - 2023.01.29
-### Updated edocs overview section.
+## v0.2.1 - 2023.03.19
+### Update rebar.config deps list: 
+```{deps, [{elector, "0.2.1"}]}.```
+
+### Changed:
+- Made post and pre election hooks synchronous
+- Updated documentation
+
+### Fixed:
+- Post election hooks were not running after the election fix
+
 
 ## v0.2.0 - 2023.03.16
 ### Update rebar.config deps list: 
@@ -19,3 +28,6 @@
 ### Fixed:
 - Fixed running the ct_run command inside the docker container
 - Removed duplicate `project_plugins` from the rebar.config file
+
+## v0.1.1 - 2023.01.29
+### Updated edocs overview section.

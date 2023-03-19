@@ -1,6 +1,6 @@
 @author Anuar Alfetahe <anuar.alfetahe@gmail.com>
 @copyright 2023 Anuar Alfetahe
-@version 0.2.0
+@version 0.2.1
 @title Elector
 @doc Elector is an Erlang application that automatically detects all nodes inside the distributed Erlang cluster and chooses the leader node.
 The elections are started automatically when the Elector application is started or when a node joins or leaves the cluster.
@@ -9,11 +9,11 @@ Elector also allows you to run pre- and post-election hooks that will be trigger
 The default election strategy is to choose the node with the highest runtime.
 
 ==Installation for Elixir application==
-Add `{:elector, "~> 2.0"}` under the deps in the `mix.exs` file: 
+Add `{:elector, "~> 0.2.1"}` under the deps in the `mix.exs` file: 
 ```
     defp deps do
         [
-            {:elector, "~> 1.0"}
+            {:elector, "~> 0.2.1"}
         ]
     end
 '''
@@ -29,7 +29,7 @@ Next add `elector' under the extra_applications in the `mix.exs' file:
 '''
 
 ==Installation for Erlang application==
-Add `elector' to the deps in the `rebar.config' file: `{deps, [{elector, {"elector", "0.2.0"}]}.'
+Add `elector' to the deps in the `rebar.config' file: `{deps, [{elector, {"elector", "0.2.1"}]}.'
 Next add `elector` to the `applications` list in the `myapp.app.src' file: `{applications, [elector]}.'
 
 ==Guides==
@@ -58,15 +58,18 @@ See the `elector' module for more.
 
 `election_delay' - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).
 
-`sync_start' - If true the election will start synchronously on start up. Set it `false' if start up should be async. Default is `true'.
+`sync_start' - If true the election will start synchronously on start up. Set it `false' if start up should be async. Default value is `true'.
 
-`strategy_module' - The module that is used for the election strategy implementation. Default is `runtime_high_strategy' which chooses the node with the highest runtime. Available options are: `runtime_high_strategy` and `runtime_low_strategy'. Feel free to write your own strategy module that implements the `strategy_behaviour' module.
+`strategy_module' - The module that is used for the election strategy implementation. Available options are: `runtime_high_strategy` and `runtime_low_strategy'. Feel free to write your own strategy module that implements the `strategy_behaviour' module.
+Default value is `runtime_high_strategy' which chooses the node with the highest runtime. 
 
-`pre_election_hooks' - A list of hooks/function calls that will be triggered before the node is starting the election. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default is `[]'.
+`pre_election_hooks' - A list of hooks/function calls that will be triggered before the node is starting the election. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default value is `[]'.
 
-`post_election_hooks' - A list of hooks/function calls that will be triggered after the election process. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default is `[]'.
+`post_election_hooks' - A list of hooks/function calls that will be triggered after the election process. Expects a list of tuples with the following format: `{Module, Function, Args}'. Default value is `[]'.
 
-`startup_hooks_enabled'- If true the `pre_election_hooks' and `post_election_hooks' will be triggered on startup. Default is `true'.
+`startup_hooks_enabled'- If true the `pre_election_hooks' and `post_election_hooks' will be triggered on startup. Default value is `true'.
 
-`quorum_size' - The number of nodes(including the local node) that should be available in the cluster before the election process is started. Default is `1'. Do not set it to `0' as it will disable the election process, leave 1 if you want to run the election process even if there is only one node in the cluster.
+`quorum_size' - The number of nodes(including the local node) that should be available in the cluster before the election process is started. D
+o not set it to `0' as it will disable the election process, leave empty or `1' if you want to run the election process even if there are no other nodes in the cluster.
+Default value is `1'. 
 @end
