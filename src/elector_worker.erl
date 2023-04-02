@@ -82,10 +82,9 @@ hook_exec({M, F, A}, Caller, Ref) ->
 %%--------------------------------------------------------------------
 %% @private
 elect(State, Opts) ->
-    StrategyModule = elector_config_handler:strategy_module(),
     ExecuteHooks = maps:get(run_hooks, Opts),
     iterate_hooks(elector_config_handler:pre_election_hooks(), ExecuteHooks),
-    LeaderNode = erlang:apply(StrategyModule, elect, []),
+    LeaderNode = elector_strategy_behaviour:elect(),
     iterate_hooks(elector_config_handler:post_election_hooks(), ExecuteHooks),
     maps:put(leader_node, LeaderNode, maps:remove(schedule_election_ref, State)).
 
