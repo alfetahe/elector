@@ -49,30 +49,60 @@ get_leader() ->
 %% @doc Starts an election asynchronously.
 -spec elect() -> {ok, election_started} | {error, quorum_size_not_met}.
 elect() ->
-    case elector_config_handler:quorum_check() of
-        true ->
-            gen_server:cast(elector_worker, elect_async),
-            {ok, election_started};
-        false ->
-            {error, quorum_size_not_met}
-    end.
+    QuorumRes = elector_config_handler:quorum_check(),
+    elect_with_quorum_check(QuorumRes, async).
 
 %% @doc Starts an election synchronously.
 -spec elect_sync() -> {ok, election_finished} | {error, term()}.
 elect_sync() ->
-    case elector_config_handler:quorum_check() of
-        true ->
-            Resp = gen_server:call(elector_worker, elect_sync),
-            if Resp =:= election_finished ->
-                   {ok, election_finished};
-               true ->
-                   {error, Resp}
-            end;
-        false ->
-            {error, quorum_size_not_met}
-    end.
+    QuorumRes = elector_config_handler:quorum_check(),
+    elect_with_quorum_check(QuorumRes, sync).  
 
-%% @doc Clears the leader node.
+%% @doc Clears the leader node and sets it to undefined.
 -spec clear_leader() -> {ok, leader_cleared}.
 clear_leader() ->
     gen_server:call(elector_worker, clear_leader).
+
+
+%%--------------------------------------------------------------------
+%% Internal functions
+%%--------------------------------------------------------------------
+
+%% @private
+elect_with_quorum_check(QuorumCheck, ElectType) when QuorumCheck =:= true ->
+    case ElectType of
+        sync ->
+            Resp = gen_server:multi_call(elector_rpc_client:nodes(), elector_worker, elect_sync),
+            handle_sync_elect_resp(Resp);
+        async ->
+            gen_server:abcast(elector_rpc_client:nodes(), elector_worker, elect_async),
+            {ok, election_started}
+    end;
+elect_with_quorum_check(_QuorumCheck, _ElectType) ->
+    {error, quorum_size_not_met}.
+
+%% @private
+handle_sync_elect_resp({SuccResp, BadNodes}) ->
+    case BadNodes of
+        [] ->
+            case fold_responses(SuccResp) of
+                [] ->
+                    {ok, election_finished};
+                Res ->
+                    {error, {elect_failed_nodes, Res}}
+            end;
+        _ ->
+            {error, {nodes_multicall_failed, BadNodes}}
+    end.
+
+%% @private
+fold_responses(SuccResp) ->
+    lists:foldl(
+        fun ({Node, Resp}, Acc) -> 
+            case Resp of
+                election_finished ->
+                    Acc;
+                _ ->
+                    [{Node, Resp} | Acc]
+            end
+        end, [], SuccResp).
