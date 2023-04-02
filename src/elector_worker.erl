@@ -60,6 +60,8 @@ handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};
 handle_call(elect_sync, _From, State) ->
     {reply, election_finished, elect(State, #{run_hooks => true})};
+handle_call(clear_leader, _From, State) ->
+    {reply, {ok, leader_cleared}, maps:put(leader_node, undefined, State)};
 handle_call(Msg, _From, State) ->
     {reply, Msg, State}.
 

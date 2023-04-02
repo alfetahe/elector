@@ -20,7 +20,7 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([is_leader/0, elect/0, elect_sync/0, get_leader/0]).
+-export([is_leader/0, elect/0, elect_sync/0, get_leader/0, clear_leader/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -51,7 +51,7 @@ get_leader() ->
 elect() ->
     case elector_config_handler:quorum_check() of
         true ->
-            gen_server:cast(electionworker, elect_async),
+            gen_server:cast(elector_worker, elect_async),
             {ok, election_started};
         false ->
             {error, quorum_size_not_met}
@@ -71,3 +71,8 @@ elect_sync() ->
         false ->
             {error, quorum_size_not_met}
     end.
+
+%% @doc Clears the leader node.
+-spec clear_leader() -> {ok, leader_cleared}.
+clear_leader() ->
+    gen_server:call(elector_worker, clear_leader).
