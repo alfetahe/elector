@@ -9,6 +9,15 @@ Elector also allows you to run pre- and post-election hooks that will be trigger
 
 The default election strategy is to choose the node with the highest runtime.
 
+## Features
+- Automatic election process on startup or when node joins/leaves the cluster
+- Ability to configure pre and post election hooks that will be called before and after the election process
+- Provides 2 built in election strategies and allows you to use your own strategy implementation (See `elector_strategy_behaviour` module for reference`)
+- Provides quorum option to detect split brain scenarios
+- Provides option to define the election delay in milliseconds before the election process is started automatically and queue the
+election calls
+
+## Configuration
 Elector supports the following configurations:
 - `election_delay` - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).
 - `sync_start` - If true the election will start synchronously on start up. Set it `false` if start up should be async. Default value is `true`.
@@ -18,22 +27,24 @@ implementation. Available options are: `elector_rt_high_strategy` and `elector_r
 a list of tuples with the following format: `{Module, Function, Args}`. Default value is `[]`.
 `post_election_hooks` - A list of hooks/function calls that will be triggered exactly after the election process. Expects
 a list of tuples with the following format: `{Module, Function, Args}`. Default value is `[]`.
-- `startup_hooks_enabled`- If true the `pre_election_hooks` and - `post_election_hooks` will be triggered on startup. Default is `true`.
+- `startup_hooks_enabled`- If true the `pre_election_hooks` and - `post_election_hooks` will be triggered on startup. Default value is `true`.
 - `quorum_size` - The number of nodes(including the local node) that should be available in the cluster before the election process is started. Do not set it to `0` as it will disable the election process, leave empty or `1` if you want to run the election process even there are no other nodes in the cluster. Default value is `1`. 
+
+Keep in mind to use the same configuration for all nodes in the cluster!
 
 ## Guides
 
 ### Installation for Elixir application
-- Add `{:elector, "~> 0.2.1"}` under the deps in the `mix.exs` file: 
-```
+- Add `{:elector, "~> 0.2.2"}` under the deps in the `mix.exs` file: 
+```elixir
 defp deps do
     [
-        {:elector, "~> 0.2.1"}
+        {:elector, "~> 0.2.2"}
     ]
 end
 ```
 - Add `elector` under the extra_applications in the `mix.exs` file:
-```
+```elixir
 def application do
     [
         extra_applications: [:elector],
@@ -43,21 +54,40 @@ end
 ```
 
 ### Installation for Erlang application
-- Add `elector` to the deps in the `rebar.config` file: `{deps, [{"elector", "0.2.1"}]}.`.
+- Add `elector` to the deps in the `rebar.config` file: `{deps, [{"elector", "0.2.2"}]}.`.
 - Add `elector` to the `applications` list in the `myapp.app.src` file: `{applications, [elector]}.`
 
+## Examples
+
 ### Start election manually
-Elixir: `:elector.elect_sync()` or `:elector.elect()`
-Erlang: `elector:elect_sync()` or `elector:elect()`
+
+#### Elixir
+```elixir
+> alias :elector, as Elector
+> Elector.elect_sync() # Start election synchronously
+{:ok, :election_finished}
+> Elector.elect() # Start election asynchronously
+{:ok, :election_started}
+```
+#### Erlang
+```erlang
+> elector:elect_sync(). % Start election synchronously
+{ok, election_finished}
+> elector:elect(). % Start election asynchronously
+{ok, election_started}
+```
 
 ### Get current leader
-```
+
+#### Elixir
+```elixir
 > alias :elector, as Elector
 > Elector.get_leader()
 {:ok, :example_node}
 ```
 
-```
+#### Erlang
+```erlang
 > elector:get_leader().
 {ok, example_node}
 ```
@@ -66,7 +96,7 @@ See the `elector` module for more.
 
 https://hexdocs.pm/elector/
 
-## For contributors:
+## Setup Elector locally
 
 ### Setup the elector locally and run the application:
 - `docker-compose up -d`
@@ -78,5 +108,4 @@ https://hexdocs.pm/elector/
 - `rebar3 compile && ct_run -dir test -logdir test_logs -pa ./_build/default/lib/elector/ebin -setcookie cookievalue`
 
 ### Generate documentation:
-- `erl -noshell -run edoc_run files '["src/elector.erl"]' '[{dir, "doc"}]'`
 - `rebar3 edoc`

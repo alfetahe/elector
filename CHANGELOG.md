@@ -1,5 +1,23 @@
 # Change log
 
+## v0.2.2 - 2023.04.02
+### Update rebar.config deps list: 
+```{deps, [{elector, "0.2.2"}]}.```
+
+### Changed:
+- Calling manually elect functions will trigger the election globally
+on all nodes
+- Doc directory to git
+- Test logs directory to git
+- Updated documentation and readme file
+
+### Added
+- New API function clear_leader/0 with test suite
+- Added more assertions for elector:elect and elector:elect_sync functions
+
+### Fixed
+- Fixed typo on the elect cast function gen_server's name.
+
 ## v0.2.1 - 2023.03.19
 ### Update rebar.config deps list: 
 ```{deps, [{elector, "0.2.1"}]}.```

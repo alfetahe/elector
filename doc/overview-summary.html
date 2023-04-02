@@ -9,7 +9,7 @@
 <div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
 <h1>Elector</h1>
 <p>Copyright © 2023 Anuar Alfetahe</p>
-<p><b>Version:</b> 0.2.1</p>
+<p><b>Version:</b> 0.2.2</p>
 <p><b>Authors:</b> Anuar Alfetahe (<a href="mailto:anuar.alfetahe@gmail.com"><tt>anuar.alfetahe@gmail.com</tt></a>).</p>
 <p>Elector is an Erlang application that automatically detects all nodes inside the distributed Erlang cluster and chooses the leader node.
 The elections are started automatically when the Elector application is started or when a node joins or leaves the cluster.
@@ -17,12 +17,22 @@ Elector also allows you to run pre- and post-election hooks that will be trigger
 
 <p>The default election strategy is to choose the node with the highest runtime.</p>
 
+
+<h3><a name="Features">Features</a></h3>
+<ul>
+  <li>Automatic election process on startup or when node joins/leaves the cluster</li>
+  <li>Ability to configure pre and post election hooks that will be called before and after the election process</li>
+  <li>Provides 2 built in election strategies and allows you to use your own strategy implementation</li>
+  <li>Provides quorum option to detect split brain scenarios</li>
+  <li>Provides option to define the election delay in milliseconds before the election process is started automatically and queue the election calls</li>
+</ul>
+
 <h3><a name="Installation_for_Elixir_application">Installation for Elixir application</a></h3><p>
-Add <code>{:elector, "~&gt; 0.2.1"}` under the deps in the `mix.exs` file: 
+Add <code>{:elector, "~&gt; 0.2.2"}` under the deps in the `mix.exs` file: 
 ```
     defp deps do
         [
-            {:elector, "~&gt; 0.2.1"}
+            {:elector, "~&gt; 0.2.2"}
         ]
     end</code>''</p>
 
@@ -35,23 +45,38 @@ Next add <code>elector</code> under the extra_applications in the <code>mix.exs<
   end</pre>
 
 <h3><a name="Installation_for_Erlang_application">Installation for Erlang application</a></h3><p>
-Add <code>elector</code> to the deps in the <code>rebar.config</code> file: <code>{deps, [{elector, {"elector", "0.2.1"}]}.</code>
+Add <code>elector</code> to the deps in the <code>rebar.config</code> file: <code>{deps, [{elector, {"elector", "0.2.2"}]}.</code>
 Next add <code>elector` to the `applications` list in the `myapp.app.src</code> file: <code>{applications, [elector]}.</code></p>
 
-<h3><a name="Guides">Guides</a></h3>
+<h3><a name="Examples">Examples</a></h3>
 
-<h4><a name="Start_election_manually">Start election manually</a></h4><p>
-Elixir: <code>:elector.elect_sync()</code> or <code>:elector.elect()</code></p>
+<h4><a name="Start_election_manually">Start election manually</a></h4>
 
-<p>Erlang: <code>elector:elect_sync()</code> or <code>elector:elect()</code></p>
+<h5><a name="Elixir">Elixir</a></h5>
+<pre>&gt; alias :elector, as Elector
+&gt; Elector.elect_sync() # Start election synchronously
+{:ok, :election_finished}
+&gt; Elector.elect() # Start election asynchronously
+{:ok, :election_started}</pre>
+
+<h5><a name="Erlang">Erlang</a></h5>
+<pre>&gt; elector:elect_sync(). % Start election synchronously
+{ok, election_finished}
+&gt; elector:elect(). % Start election asynchronously
+{ok, election_started}</pre>
 
 <h4><a name="Get_current_leader">Get current leader</a></h4>
+
+<h5><a name="Elixir">Elixir</a></h5>
 <pre>&gt; alias :elector, as Elector
 &gt; Elector.get_leader()
 {:ok, :example_node}</pre>
 
+<h5><a name="Erlang">Erlang</a></h5>
 <pre>&gt; elector:get_leader().
 {ok, example_node}</pre>
+
+
 
 <p>See the <code>elector</code> module for more.</p>
 

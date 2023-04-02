@@ -56,13 +56,12 @@ elect() ->
 -spec elect_sync() -> {ok, election_finished} | {error, term()}.
 elect_sync() ->
     QuorumRes = elector_config_handler:quorum_check(),
-    elect_with_quorum_check(QuorumRes, sync).  
+    elect_with_quorum_check(QuorumRes, sync).
 
 %% @doc Clears the leader node and sets it to undefined.
 -spec clear_leader() -> {ok, leader_cleared}.
 clear_leader() ->
     gen_server:call(elector_worker, clear_leader).
-
 
 %%--------------------------------------------------------------------
 %% Internal functions
@@ -72,10 +71,13 @@ clear_leader() ->
 elect_with_quorum_check(QuorumCheck, ElectType) when QuorumCheck =:= true ->
     case ElectType of
         sync ->
-            Resp = gen_server:multi_call(elector_rpc_client:nodes(), elector_worker, elect_sync),
+            Resp =
+                gen_server:multi_call(
+                    elector_rpc_client:nodes(), elector_worker, elect_sync),
             handle_sync_elect_resp(Resp);
         async ->
-            gen_server:abcast(elector_rpc_client:nodes(), elector_worker, elect_async),
+            gen_server:abcast(
+                elector_rpc_client:nodes(), elector_worker, elect_async),
             {ok, election_started}
     end;
 elect_with_quorum_check(_QuorumCheck, _ElectType) ->
@@ -97,12 +99,13 @@ handle_sync_elect_resp({SuccResp, BadNodes}) ->
 
 %% @private
 fold_responses(SuccResp) ->
-    lists:foldl(
-        fun ({Node, Resp}, Acc) -> 
-            case Resp of
-                election_finished ->
-                    Acc;
-                _ ->
-                    [{Node, Resp} | Acc]
-            end
-        end, [], SuccResp).
+    lists:foldl(fun({Node, Resp}, Acc) ->
+                   case Resp of
+                       election_finished ->
+                           Acc;
+                       _ ->
+                           [{Node, Resp} | Acc]
+                   end
+                end,
+                [],
+                SuccResp).

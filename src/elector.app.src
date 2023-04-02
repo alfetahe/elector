@@ -2,7 +2,7 @@
  elector,
  [{description,
    "Automatic leader node election library for Elixir & Erlang projects running on a cluster of nodes."},
-  {vsn, "0.2.1"},
+  {vsn, "0.2.2"},
   {registered, []},
   {mod, {elector_app, []}},
   {applications, [kernel, stdlib]},

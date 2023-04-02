@@ -28,13 +28,20 @@
  
   See the README.md file for more information.
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#elect-0">elect/0</a></td><td>Starts an election asynchronously.</td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#clear_leader-0">clear_leader/0</a></td><td>Clears the leader node and sets it to undefined.</td></tr>
+<tr><td valign="top"><a href="#elect-0">elect/0</a></td><td>Starts an election asynchronously.</td></tr>
 <tr><td valign="top"><a href="#elect_sync-0">elect_sync/0</a></td><td>Starts an election synchronously.</td></tr>
 <tr><td valign="top"><a href="#get_leader-0">get_leader/0</a></td><td>Returns the current leader node's machine name.</td></tr>
 <tr><td valign="top"><a href="#is_leader-0">is_leader/0</a></td><td>Returns boolean true this node is the leader or false if not.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="clear_leader-0">clear_leader/0</a></h3>
+<div class="spec">
+<p><tt>clear_leader() -&gt; {ok, leader_cleared}</tt><br></p>
+<p> </p>
+</div><p>Clears the leader node and sets it to undefined.</p>
 
 <h3 class="function"><a name="elect-0">elect/0</a></h3>
 <div class="spec">
