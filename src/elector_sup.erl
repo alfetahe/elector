@@ -33,10 +33,14 @@ start_link() ->
 %%--------------------------------------------------------------------
 init([]) ->
     ElectionWorker = #{id => elector_worker, start => {elector_worker, start_link, []}},
+
+    % TODO: singleton work
+    SingletonOverviewer = #{id => elector_overviewer, start => {elector_overviewer, start_link, [Args]}},
+
     SupFlags =
         #{strategy => one_for_all,
           intensity => 0,
           period => 1},
-    ChildSpecs = [ElectionWorker],
+    ChildSpecs = [ElectionWorker, SingletonOverviewer],
 
     {ok, {SupFlags, ChildSpecs}}.
