@@ -28,7 +28,7 @@
 %% @doc Returns boolean true this node is the leader or false if not.
 -spec is_leader() -> {ok, boolean()} | {error, leader_node_not_set}.
 is_leader() ->
-    LeaderNode = gen_server:call(elector_worker, get_leader),
+    LeaderNode = gen_server:call(elector_state, get_leader),
     IsLeader = LeaderNode =:= node(),
     if is_atom(LeaderNode) ->
            {ok, IsLeader};
@@ -39,7 +39,7 @@ is_leader() ->
 %% @doc Returns the current leader node's machine name.
 -spec get_leader() -> {ok, node()} | {error, leader_node_not_set}.
 get_leader() ->
-    LeaderNode = gen_server:call(elector_worker, get_leader),
+    LeaderNode = gen_server:call(elector_state, get_leader),
     if is_atom(LeaderNode) ->
            {ok, LeaderNode};
        true ->
@@ -61,7 +61,7 @@ elect_sync() ->
 %% @doc Clears the leader node and sets it to undefined.
 -spec clear_leader() -> {ok, leader_cleared}.
 clear_leader() ->
-    gen_server:call(elector_worker, clear_leader).
+    gen_server:call(elector_state, clear_leader).
 
 %%--------------------------------------------------------------------
 %% Internal functions
@@ -73,11 +73,11 @@ elect_with_quorum_check(QuorumCheck, ElectType) when QuorumCheck =:= true ->
         sync ->
             Resp =
                 gen_server:multi_call(
-                    elector_rpc_client:nodes(), elector_worker, elect_sync),
+                    elector_rpc_client:nodes(), elector_state, elect_sync),
             handle_sync_elect_resp(Resp);
         async ->
             gen_server:abcast(
-                elector_rpc_client:nodes(), elector_worker, elect_async),
+                elector_rpc_client:nodes(), elector_state, elect_async),
             {ok, election_started}
     end;
 elect_with_quorum_check(_QuorumCheck, _ElectType) ->

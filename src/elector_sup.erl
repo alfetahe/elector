@@ -32,7 +32,7 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init([]) ->
-    ElectionWorker = #{id => elector_worker, start => {elector_worker, start_link, []}},
+    ElectionWorker = #{id => elector_state, start => {elector_state, start_link, []}},
     SingletonOverviewer =
         #{id => elector_overviewer, start => {elector_overviewer, start_link, []}},
 

@@ -1,12 +1,12 @@
 %%%-------------------------------------------------------------------
-%% @doc Main worker process who's responsibility is to start the
+%% @doc Main elector state process who's responsibility is to start the
 %% election process on start up either syncronously or asyncronously.
 %% Also sets up monitoring for node up and down events and triggers
 %% automatic election if a node goes down or comes up.
 %% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(elector_worker).
+-module(elector_state).
 
 %%--------------------------------------------------------------------
 %% Behaviours
@@ -23,7 +23,7 @@
 %%--------------------------------------------------------------------
 %% Exported functions
 %%--------------------------------------------------------------------
-%% @doc Starts the elector worker process.
+%% @doc Starts the elector state process.
 -spec start_link() -> {ok, pid()} | ignore | {error, term()}.
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
