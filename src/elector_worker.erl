@@ -26,14 +26,7 @@
 %% @doc Starts the elector worker process.
 -spec start_link() -> {ok, pid()} | ignore | {error, term()}.
 start_link() ->
-    case gen_server:start_link({local, ?MODULE}, ?MODULE, [], []) of
-        {ok, Pid} ->
-            {ok, Pid};
-        {error, {already_started, Pid}} ->
-            {ok, Pid};
-        Else ->
-            Else
-    end.
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 %%--------------------------------------------------------------------
 %% Callback functions
