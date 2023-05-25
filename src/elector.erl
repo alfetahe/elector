@@ -22,6 +22,8 @@
 %%--------------------------------------------------------------------
 -export([is_leader/0, elect/0, elect_sync/0, get_leader/0, clear_leader/0]).
 
+-type leader_node() :: node() | undefined.
+
 %%--------------------------------------------------------------------
 %% Exported functions
 %%--------------------------------------------------------------------
@@ -47,13 +49,13 @@ get_leader() ->
     end.
 
 %% @doc Starts an election asynchronously.
--spec elect() -> {ok, election_started} | {error, quorum_size_not_met}.
+-spec elect() -> {ok, election_msg_passed} | {error, quorum_size_not_met}.
 elect() ->
     QuorumRes = elector_config_handler:quorum_check(),
     elect_with_quorum_check(QuorumRes, async).
 
 %% @doc Starts an election synchronously.
--spec elect_sync() -> {ok, election_finished} | {error, term()}.
+-spec elect_sync() -> {ok, leader_node()} | {error, term()}.
 elect_sync() ->
     QuorumRes = elector_config_handler:quorum_check(),
     elect_with_quorum_check(QuorumRes, sync).
@@ -78,7 +80,7 @@ elect_with_quorum_check(QuorumCheck, ElectType) when QuorumCheck =:= true ->
         async ->
             gen_server:abcast(
                 elector_rpc_client:nodes(), elector_state, elect_async),
-            {ok, election_started}
+            {ok, election_msg_passed}
     end;
 elect_with_quorum_check(_QuorumCheck, _ElectType) ->
     {error, quorum_size_not_met}.

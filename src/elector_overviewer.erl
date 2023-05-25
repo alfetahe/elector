@@ -35,7 +35,7 @@ monitor_manager() ->
     monitor(process, global:whereis_name(elector_singleton)).
 
 start_manager() ->
-    case elector_singleton:start_link([]) of
+    case elector_singleton:start_link() of
         {ok, _} ->
             ok;
         {error, {already_started, _}} ->

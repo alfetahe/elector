@@ -17,8 +17,7 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([start_link/0]).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, handle_continue/2]).
--export([hook_exec/3]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -32,26 +31,8 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init(_) ->
-    net_kernel:monitor_nodes(true),
-    SyncStart = elector_config_handler:sync_start(),
-    Opts = #{run_hooks => elector_config_handler:startup_hooks_enabled()},
-    if SyncStart =:= true ->
-           {ok, init_sync_state(Opts, elector_config_handler:quorum_check())};
-       true ->
-           {ok, Opts, {continue, setup}}
-    end.
+    {ok, #{}}.
 
-handle_continue(setup, Opts) ->
-    NewOpts = maps:put(delay, nil, Opts),
-    schedule_election(#{}, NewOpts),
-    {noreply, #{}}.
-
-handle_info(election_schedule, State) ->
-    {noreply, elect(State, #{run_hooks => true})};
-handle_info({nodeup, _Node}, State) ->
-    {noreply, schedule_election(State, #{delay => nil})};
-handle_info({nodedown, _Node}, State) ->
-    {noreply, schedule_election(State, #{delay => nil})};
 handle_info(Msg, State) ->
     logger:notice("Unexpected message received at elector: " ++ io:format("~p", [Msg])),
     {noreply, State}.
@@ -59,72 +40,12 @@ handle_info(Msg, State) ->
 handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};
 handle_call(elect_sync, _From, State) ->
-    {reply, election_finished, elect(State, #{run_hooks => true})};
+    LeaderNode = gen_server:call({global, elector_singleton}, start_election, 10000),
+    {reply, election_finished, maps:put(leader_node, LeaderNode, State)};
 handle_call(clear_leader, _From, State) ->
     {reply, {ok, leader_cleared}, maps:put(leader_node, undefined, State)};
 handle_call(Msg, _From, State) ->
     {reply, Msg, State}.
 
-handle_cast(elect_async, State) ->
-    {noreply, elect(State, #{run_hooks => true})};
 handle_cast(_msg, state) ->
     {noreply, state}.
-
-%%--------------------------------------------------------------------
-%% API functions
-%%--------------------------------------------------------------------
-hook_exec({M, F, A}, Caller, Ref) ->
-    erlang:apply(M, F, A),
-    Caller ! {hook_executed, Ref}.
-
-%%--------------------------------------------------------------------
-%% Internal functions
-%%--------------------------------------------------------------------
-%% @private
-elect(State, Opts) ->
-    ExecuteHooks = maps:get(run_hooks, Opts),
-    iterate_hooks(elector_config_handler:pre_election_hooks(), ExecuteHooks),
-    LeaderNode = elector_strategy_behaviour:elect(),
-    iterate_hooks(elector_config_handler:post_election_hooks(), ExecuteHooks),
-    maps:put(leader_node, LeaderNode, maps:remove(schedule_election_ref, State)).
-
-%% @private
-iterate_hooks([], _ExecuteHooks) ->
-    ok;
-iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
-    Ref = erlang:make_ref(),
-    spawn(?MODULE, hook_exec, [Mfa, self(), Ref]),
-    receive
-        {hook_executed, Ref} ->
-            ok
-    after 3000 ->
-        logger:error("Election hook timeout", [])
-    end,
-    iterate_hooks(Hooks, ExecuteHooks).
-
-%% @private
-send_election_msg(Delay) ->
-    erlang:send_after(Delay, ?MODULE, election_schedule).
-
-%% @private
-schedule_election(State, #{delay := Delay}) ->
-    DelayVal =
-        if is_integer(Delay) ->
-               Delay;
-           true ->
-               elector_config_handler:election_delay()
-        end,
-
-    ElectionTimerRef = maps:is_key(schedule_election_ref, State),
-    QuorumCheck = elector_config_handler:quorum_check(),
-    if ElectionTimerRef /= true andalso QuorumCheck == true ->
-           maps:put(schedule_election_ref, send_election_msg(DelayVal), State);
-       true ->
-           State
-    end.
-
-%% @private
-init_sync_state(Opts, QuorumCheck) when QuorumCheck == true ->
-    elect(#{}, Opts);
-init_sync_state(_Opts, _QuorumCheck) ->
-    #{leader_node => undefined}.
