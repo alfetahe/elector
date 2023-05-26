@@ -40,7 +40,8 @@ start_link() ->
 -spec init(any()) -> {ok, schedule_ref()}.
 init(_) ->
     net_kernel:monitor_nodes(true),
-    {ok, send_election_msg(0)}.
+    SheduleRef = schedule_election(undefined, 0),
+    {ok, SheduleRef}.
 
 handle_info(election_schedule, _ScheduleRef) ->
     elector_service:exec_election(#{run_hooks => true}),
