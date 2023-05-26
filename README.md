@@ -20,7 +20,6 @@ election calls
 ## Configuration
 Elector supports the following configurations:
 - `election_delay` - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).
-- `sync_start` - If true the election will start synchronously on start up. Set it `false` if start up should be async. Default value is `true`.
 - `strategy_module` - The module that is used for the election strategy
 implementation. Available options are: `elector_rt_high_strategy` and `elector_rt_low_strategy`. Feel free to write your own strategy module that implements the `elector_strategy_behaviour` module. Default value is `elector_rt_high_strategy` which chooses the node with the highest runtime.
 - `pre_election_hooks` - A list of hooks/function calls that will be triggered exactly before the node is starting the election. Expects

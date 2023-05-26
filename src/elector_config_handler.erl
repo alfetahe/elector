@@ -10,8 +10,8 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([election_delay/0, strategy_module/0, sync_start/0, pre_election_hooks/0,
-         post_election_hooks/0, startup_hooks_enabled/0, quorum_size/0, quorum_check/0]).
+-export([election_delay/0, strategy_module/0, pre_election_hooks/0, post_election_hooks/0,
+         startup_hooks_enabled/0, quorum_size/0, quorum_check/0]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -29,13 +29,6 @@ election_delay() ->
 -spec strategy_module() -> StrategyModule :: module().
 strategy_module() ->
     application:get_env(elector, strategy_module, elector_rt_high_strategy).
-
-%% @doc Returns the configured sync_start flag.
-%% Default value is `true'.
-%% @end
--spec sync_start() -> SyncStart :: boolean().
-sync_start() ->
-    application:get_env(elector, sync_start, true).
 
 %% @doc Returns the configured pre election hooks.
 %% Default value is `[]'.

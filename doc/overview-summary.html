@@ -85,8 +85,6 @@ Next add <code>elector` to the `applications` list in the `myapp.app.src</code> 
 
 <p><code>election_delay</code> - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).</p>
 
-<p><code>sync_start</code> - If true the election will start synchronously on start up. Set it <code>false</code> if start up should be async. Default value is <code>true</code>.</p>
-
 <p><code>strategy_module</code> - The module that is used for the election strategy implementation. Available options are: <code>runtime_high_strategy` and `runtime_low_strategy</code>. Feel free to write your own strategy module that implements the <code>strategy_behaviour</code> module.
 Default value is <code>runtime_high_strategy</code> which chooses the node with the highest runtime. </p>
 

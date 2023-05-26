@@ -87,8 +87,6 @@ See the `elector' module for more.
 
 `election_delay' - The delay in milliseconds before the new election starts. This value is used automatic election is triggered either by node join/leave or startup. Default value is 1 second(1000).
 
-`sync_start' - If true the election will start synchronously on start up. Set it `false' if start up should be async. Default value is `true'.
-
 `strategy_module' - The module that is used for the election strategy implementation. Available options are: `runtime_high_strategy` and `runtime_low_strategy'. Feel free to write your own strategy module that implements the `strategy_behaviour' module.
 Default value is `runtime_high_strategy' which chooses the node with the highest runtime. 
 
