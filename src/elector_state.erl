@@ -31,12 +31,14 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init(_) ->
-    {ok, #{}}.
+    {ok, #{leader_node => undefined}}.
 
 handle_info(Msg, State) ->
-    logger:notice("Unexpected message received at elector: " ++ io:format("~p", [Msg])),
+    logger:notice("Unexpected message received at elector state: " ++ io:format("~p", [Msg])),
     {noreply, State}.
 
+handle_call({set_leader, LeaderNode}, _From, State) ->
+    {reply, ok, maps:put(leader_node, LeaderNode, State)};
 handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};
 handle_call(elect_sync, _From, State) ->

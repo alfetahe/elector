@@ -50,7 +50,8 @@ handle_info({nodeup, _Node}, ScheduleRef) ->
 handle_info({nodedown, _Node}, ScheduleRef) ->
     {noreply, schedule_election(ScheduleRef, undefined)};
 handle_info(Msg, ScheduleRef) ->
-    logger:notice("Unexpected message received at elector: " ++ io:format("~p", [Msg])),
+    logger:notice("Unexpected message received at elector singleton: "
+                  ++ io:format("~p", [Msg])),
     {noreply, ScheduleRef}.
 
 handle_call(start_election, _From, _ScheduleRef) ->
@@ -82,10 +83,10 @@ schedule_election(_ScheduleRef, Delay) ->
 send_election_msg(Delay) ->
     AgreedDelay =
         case is_number(Delay) of
-            DelayVal ->
-                DelayVal;
+            true ->
+                Delay;
             false ->
                 elector_config_handler:election_delay()
         end,
 
-    erlang:send_after(AgreedDelay, ?MODULE, election_schedule).
+    erlang:send_after(AgreedDelay, self(), election_schedule).

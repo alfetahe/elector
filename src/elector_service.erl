@@ -7,6 +7,7 @@ exec_election(Opts) ->
     iterate_hooks(elector_config_handler:pre_election_hooks(), ExecuteHooks),
     LeaderNode = elector_strategy_behaviour:elect(),
     iterate_hooks(elector_config_handler:post_election_hooks(), ExecuteHooks),
+    gen_server:call(elector_state, {set_leader, LeaderNode}),
     LeaderNode.
 
 hook_exec({M, F, A}, Caller, Ref) ->
