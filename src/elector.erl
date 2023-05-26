@@ -20,9 +20,11 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([is_leader/0, elect/0, elect_sync/0, get_leader/0, clear_leader/0]).
+-export([is_leader/0, elect/0, elect_sync/0, get_leader/0, clear_leader/0,
+         clear_leader_sync/0]).
 
 -type leader_node() :: node() | undefined.
+-type node_responses() :: {list(), list()}.
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -49,65 +51,48 @@ get_leader() ->
     end.
 
 %% @doc Starts an election asynchronously.
--spec elect() -> {ok, election_msg_passed} | {error, quorum_size_not_met}.
+-spec elect() ->
+               {ok, election_msg_passed} |
+               {error, quorum_size_not_met} |
+               {error, election_singleton_not_up}.
 elect() ->
+    SingletonPid = elector_service:singleton_pid(),
     QuorumRes = elector_config_handler:quorum_check(),
-    elect_with_quorum_check(QuorumRes, async).
+    start_election(async, SingletonPid, QuorumRes).
 
 %% @doc Starts an election synchronously.
--spec elect_sync() -> {ok, leader_node()} | {error, term()}.
+-spec elect_sync() ->
+                    {ok, leader_node()} |
+                    {error, quorum_size_not_met} |
+                    {error, election_singleton_not_up}.
 elect_sync() ->
+    SingletonPid = elector_service:singleton_pid(),
     QuorumRes = elector_config_handler:quorum_check(),
-    elect_with_quorum_check(QuorumRes, sync).
+    start_election(sync, SingletonPid, QuorumRes).
 
 %% @doc Clears the leader node and sets it to undefined.
 -spec clear_leader() -> {ok, leader_cleared}.
 clear_leader() ->
-    gen_server:call(elector_state, clear_leader).
+    gen_server:abcast([node() | nodes()], elector_state, clear_leader),
+    {ok, leader_cleared}.
+
+%% @doc Clears the leader node and sets it to undefined.
+-spec clear_leader_sync() -> {ok, node_responses()}.
+clear_leader_sync() ->
+    {ok, gen_server:multi_call([node() | nodes()], elector_state, clear_leader)}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
 
 %% @private
-elect_with_quorum_check(QuorumCheck, ElectType) when QuorumCheck =:= true ->
-    case ElectType of
-        sync ->
-            Resp =
-                gen_server:multi_call(
-                    elector_rpc_client:nodes(), elector_state, elect_sync),
-            handle_sync_elect_resp(Resp);
-        async ->
-            gen_server:abcast(
-                elector_rpc_client:nodes(), elector_state, elect_async),
-            {ok, election_msg_passed}
-    end;
-elect_with_quorum_check(_QuorumCheck, _ElectType) ->
-    {error, quorum_size_not_met}.
-
-%% @private
-handle_sync_elect_resp({SuccResp, BadNodes}) ->
-    case BadNodes of
-        [] ->
-            case fold_responses(SuccResp) of
-                [] ->
-                    {ok, election_finished};
-                Res ->
-                    {error, {elect_failed_nodes, Res}}
-            end;
-        _ ->
-            {error, {nodes_multicall_failed, BadNodes}}
-    end.
-
-%% @private
-fold_responses(SuccResp) ->
-    lists:foldl(fun({Node, Resp}, Acc) ->
-                   case Resp of
-                       election_finished ->
-                           Acc;
-                       _ ->
-                           [{Node, Resp} | Acc]
-                   end
-                end,
-                [],
-                SuccResp).
+start_election(_Type, _SingletonPid, QuorumCheck) when QuorumCheck =:= false ->
+    {error, quorum_size_not_met};
+start_election(_Type, SingletonPid, _QuorumCheck) when is_pid(SingletonPid) =:= false ->
+    {error, election_singleton_not_up};
+start_election(sync, SingletonPid, _QuorumCheck) ->
+    LeaderNode = gen_server:call(SingletonPid, start_election),
+    {ok, LeaderNode};
+start_election(async, SingletonPid, _QuorumCheck) ->
+    gen_server:cast(SingletonPid, start_election),
+    {ok, election_msg_passed}.

@@ -32,7 +32,7 @@ handle_info(_, State) ->
     {noreply, State}.
 
 monitor_manager() ->
-    monitor(process, global:whereis_name(elector_singleton)).
+    monitor(process, elector_service:singleton_pid()).
 
 start_manager() ->
     case elector_singleton:start_link() of

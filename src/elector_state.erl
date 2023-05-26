@@ -49,5 +49,7 @@ handle_call(clear_leader, _From, State) ->
 handle_call(Msg, _From, State) ->
     {reply, Msg, State}.
 
+handle_cast(clear_leader, State) ->
+    {noreply, maps:put(leader_node, undefined, State)};
 handle_cast(_msg, state) ->
     {noreply, state}.

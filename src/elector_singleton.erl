@@ -61,6 +61,9 @@ handle_call(start_election, _From, _ScheduleRef) ->
 handle_call(Msg, _From, ScheduleRef) ->
     {reply, Msg, ScheduleRef}.
 
+handle_cast(start_election, _ScheduleRef) ->
+    elector_service:exec_election(#{run_hooks => true}),
+    {noreply, undefined};
 handle_cast(_msg, ScheduleRef) ->
     {noreply, ScheduleRef}.
 

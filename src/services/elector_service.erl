@@ -1,6 +1,9 @@
 -module(elector_service).
 
--export([exec_election/1, hook_exec/3]).
+-export([exec_election/1, hook_exec/3, singleton_pid/0]).
+
+singleton_pid() ->
+    global:whereis_name(elector_singleton).
 
 exec_election(Opts) ->
     ExecuteHooks = maps:get(run_hooks, Opts),
