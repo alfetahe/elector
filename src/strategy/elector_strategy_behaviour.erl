@@ -32,5 +32,5 @@
 %% @end
 -spec elect() -> Leader :: leader().
 elect() ->
-    Strategy_module = application:get_env(elector, strategy_module, elector_rt_high_strategy),
-    erlang:apply(Strategy_module, elect, []).
+    erlang:apply(
+        elector_config_handler:strategy_module(), elect, []).

@@ -27,6 +27,6 @@ iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
         {hook_executed, Ref} ->
             ok
     after 3000 ->
-        logger:error("Election hook timeout", [])
+        throw({error, election_hook_timed_out})
     end,
     iterate_hooks(Hooks, ExecuteHooks).

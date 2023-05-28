@@ -71,5 +71,5 @@ quorum_check() ->
         undefined ->
             true;
         _ ->
-            Quorum =< length(elector_rpc_client:nodes())
+            Quorum =< length([node() | nodes()])
     end.

@@ -9,7 +9,7 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([elect/1, host_node_runtime/0]).
+-export([elect/1]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -17,41 +17,31 @@
 %% @doc Starts the election process.
 -spec elect(Type :: high | low) -> Leader :: elector_strategy_behaviour:leader().
 elect(Type) ->
-    Runtimes = iterate_runtimes(elector_rpc_client:nodes(), #{}),
-    choose_leader(Runtimes, Type).
+    CandidateRefs =
+        [{Node, erpc:send_request(Node, fun() -> election_data() end)}
+         || Node <- [node() | nodes()]],
+    CandiateResps = [{Node, erpc:receive_response(Ref)} || {Node, Ref} <- CandidateRefs],
+    selected_leader(CandiateResps, Type).
 
-%% @doc Returns the runtime of the host node.
--spec host_node_runtime() -> Runtime :: integer().
-host_node_runtime() ->
-    {Runtime, _TimeSinceLastCall} = erlang:statistics(runtime),
+election_data() ->
+    {Runtime, _} = erlang:statistics(runtime),
     Runtime.
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
 %% @private
-choose_leader(Runtimes, Type) ->
+selected_leader(Runtimes, Type) ->
     CompareFn =
-        fun(Node, Runtime, {AccNode, AccRuntime} = Acc) ->
-           if AccNode == nil
-              orelse Type =:= high andalso Runtime > AccRuntime
-              orelse Type =:= low andalso Runtime < AccRuntime
-              orelse Runtime =:= AccRuntime andalso Node > AccNode ->
-                  {Node, Runtime};
-              true ->
-                  Acc
-           end
+        fun (NodeRuntime, {AccNode, _}) when AccNode =:= undefined ->
+                NodeRuntime;
+            ({Node, Runtime}, {_, AccRuntime}) when Type =:= high andalso Runtime > AccRuntime ->
+                {Node, Runtime};
+            ({Node, Runtime}, {_, AccRuntime}) when Type =:= low andalso Runtime < AccRuntime ->
+                {Node, Runtime};
+            (_, Acc) ->
+                Acc
         end,
 
-    {Node, _Runtime} = maps:fold(CompareFn, {nil, 0}, Runtimes),
+    {Node, _Runtime} = lists:foldl(CompareFn, {undefined, 0}, Runtimes),
     Node.
-
-%% @private
-iterate_runtimes([Node], Runtimes) ->
-    {Runtime, _} = elector_rpc_client:call(Node, erlang, statistics, [runtime]),
-    maps:put(Node, Runtime, Runtimes);
-iterate_runtimes([Node | Nbody], Runtimes) ->
-    {Runtime, _} = elector_rpc_client:call(Node, erlang, statistics, [runtime]),
-    iterate_runtimes(Nbody, maps:put(Node, Runtime, Runtimes));
-iterate_runtimes([], Runtimes) ->
-    Runtimes.
