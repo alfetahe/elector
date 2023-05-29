@@ -14,12 +14,12 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([elect/0]).
+-export([elect/1]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
 %%--------------------------------------------------------------------
 %% @doc Starts the election process.
--spec elect() -> Leader :: elector_strategy_behaviour:leader().
-elect() ->
-    elector_rt_strategy_base:elect(high).
+-spec elect(CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
+elect(CandidateNodes) ->
+    elector_rt_strategy_base:elect(high, CandidateNodes).  

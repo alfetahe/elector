@@ -7,7 +7,7 @@
 %%--------------------------------------------------------------------
 %% Callbacks
 %%--------------------------------------------------------------------
--callback elect() -> Leader :: leader().
+-callback elect(CandidateNodes :: candidate_nodes()) -> Leader :: leader().
 
 %%--------------------------------------------------------------------
 %% Exported API
@@ -18,6 +18,7 @@
 %% Type definitions
 %%--------------------------------------------------------------------
 -type leader() :: node().
+-type candidate_nodes() :: [node()].
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -32,5 +33,20 @@
 %% @end
 -spec elect() -> Leader :: leader().
 elect() ->
-    erlang:apply(
-        elector_config_handler:strategy_module(), elect, []).
+    CandidateNodes = candidate_nodes(),
+    erlang:apply(elector_config_handler:strategy_module(), elect, [CandidateNodes]).
+    
+candidate_nodes() ->
+    NodeCandidationFun = fun()-> 
+        Pid = erlang:whereis(elector_candidate),
+        case Pid of
+            undefined ->
+                {ok, false};
+            _ ->
+                gen_server:call(Pid, is_candidate_node)
+        end
+    end,
+    CandidateRefs =
+        [{Node, erpc:send_request(Node, NodeCandidationFun)} || Node <- [node() | nodes()]],
+    Responses = [{Node, erpc:receive_response(Ref)} || {Node, Ref} <- CandidateRefs],
+    [Node || {Node, {ok, IsCandidate}} <- Responses, IsCandidate =:= true].
