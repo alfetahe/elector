@@ -1,6 +1,6 @@
 -define(NAME(BaseName, Suffix), list_to_atom(atom_to_list(BaseName) ++ "_" ++ Suffix)).
 -define(ELECTION_DELAY, 1000).
--define(DEFAULT_STRATEGY, elector_rt_high_strategy).
+-define(DEFAULT_STRATEGY, elector_wc_high_strategy).
 -define(ERPC_TIMEOUT, 5000).
 -define(HOOK_EXEC_TIMEOUT, 1000).
 -define(LEADER_CHECKUP_INTERV, 10000).

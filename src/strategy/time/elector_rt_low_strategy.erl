@@ -22,5 +22,5 @@
 %% @doc Starts the election process.
 -spec elect(CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
 elect(CandidateNodes) ->
-    elector_rt_strategy_base:elect(low, CandidateNodes).
+    elector_time_strategy_base:elect(runtime, low, CandidateNodes).
 

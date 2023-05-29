@@ -4,28 +4,28 @@
 %% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(elector_rt_strategy_base).
+-module(elector_time_strategy_base).
 
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([elect/2]).
+-export([elect/3]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
 %%--------------------------------------------------------------------
 %% @doc Starts the election process.
--spec elect(Type :: high | low, CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
-elect(Type, CandidateNodes) ->
+-spec elect(TimeType :: runtime | wall_clock, Direction :: high | low, CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
+elect(TimeType, Direction, CandidateNodes) ->
     CandidateRefs =
-        [{Node, erpc:send_request(Node, fun() -> candidate_data() end)}
+        [{Node, erpc:send_request(Node, fun() -> candidate_data(TimeType) end)}
          || Node <- CandidateNodes],
     CandiateResps = [{Node, erpc:receive_response(Ref)} || {Node, Ref} <- CandidateRefs],
-    selected_leader(CandiateResps, Type).
+    selected_leader(CandiateResps, Direction).
 
-candidate_data() ->
-    {Runtime, _} = erlang:statistics(runtime),
-    Runtime.
+candidate_data(TimeType) ->
+    {Time, _} = erlang:statistics(TimeType),
+    Time.
 
 %%--------------------------------------------------------------------
 %% Internal functions

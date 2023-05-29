@@ -4,7 +4,7 @@
 %% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(elector_rt_high_strategy).
+-module(elector_wc_high_strategy).
 
 %%--------------------------------------------------------------------
 %% Behaviours
@@ -22,4 +22,4 @@
 %% @doc Starts the election process.
 -spec elect(CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
 elect(CandidateNodes) ->
-    elector_rt_strategy_base:elect(high, CandidateNodes).  
+    elector_time_strategy_base:elect(wall_clock, high, CandidateNodes).  
