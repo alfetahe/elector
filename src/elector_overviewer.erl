@@ -34,7 +34,7 @@ handle_info(commission_checkup, State) ->
             ok
     end,
     commission_checkup(),
-    {noreply, State};    
+    {noreply, State};
 handle_info({'DOWN', _MonitorRef, process, _Object, normal}, State) ->
     {noreply, State};
 handle_info({'DOWN', _MonitorRef, process, _Object, _Info}, State) ->
@@ -56,4 +56,4 @@ start_manager() ->
     end.
 
 commission_checkup() ->
-    erlang:send_after(?COMMISSION_CHECKUP_INTERV, self(), commission_checkup).    
+    erlang:send_after(?COMMISSION_CHECKUP_INTERV, self(), commission_checkup).

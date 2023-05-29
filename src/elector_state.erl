@@ -38,21 +38,22 @@ init(_) ->
 
 handle_continue(set_leader, State) ->
     CommissionPid = elector_service:commission_pid(),
-    LeaderNode = case CommissionPid of
-        undefined ->
-            undefined;
-        _ ->
-            gen_server:call({global, elector_commission}, get_leader)
-    end,
+    LeaderNode =
+        case CommissionPid of
+            undefined ->
+                undefined;
+            _ ->
+                gen_server:call({global, elector_commission}, get_leader)
+        end,
     {noreply, maps:put(leader_node, LeaderNode, State)}.
 
 handle_info(leader_checkup, #{leader_node := undefined} = State) ->
     schedule_checkup(),
     gen_server:cast({global, elector_commission}, start_election),
-    {noreply, State};  
+    {noreply, State};
 handle_info(leader_checkup, State) ->
     schedule_checkup(),
-    {noreply, State};  
+    {noreply, State};
 handle_info(_Msg, State) ->
     {noreply, State}.
 
@@ -74,4 +75,4 @@ handle_cast(_msg, state) ->
 
 %% @private
 schedule_checkup() ->
-    erlang:send_after(?LEADER_CHECKUP_INTERV, self(), leader_checkup).    
+    erlang:send_after(?LEADER_CHECKUP_INTERV, self(), leader_checkup).

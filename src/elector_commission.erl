@@ -20,7 +20,8 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 
 -type election_schedule_ref() :: undefined | reference().
--type state() :: #{schedule_ref => election_schedule_ref(), leader_node => node() | undefined}.
+-type state() ::
+    #{schedule_ref => election_schedule_ref(), leader_node => node() | undefined}.
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -41,8 +42,7 @@ start() ->
             {ok, Pid};
         {error, {already_started, Pid}} ->
             {ok, Pid}
-    end.    
-
+    end.
 
 %%--------------------------------------------------------------------
 %% Callback functions
@@ -65,7 +65,7 @@ handle_info(_Msg, State) ->
     {noreply, State}.
 
 handle_call(get_leader, _From, State) ->
-    {reply, maps:get(leader_node, State), State};    
+    {reply, maps:get(leader_node, State), State};
 handle_call(start_election, _From, State) ->
     #{leader_node := LeaderNode} = NewState = start_election(State),
     {reply, LeaderNode, NewState};
@@ -84,7 +84,7 @@ handle_cast(_msg, State) ->
 %% @private
 start_election(State) ->
     LeaderNode = elector_service:setup_election(#{run_hooks => true}),
-    StateLeader   = maps:put(leader_node, LeaderNode, State),
+    StateLeader = maps:put(leader_node, LeaderNode, State),
     maps:put(schedule_ref, maps:put(schedule_ref, undefined, State), StateLeader).
 
 %% @private

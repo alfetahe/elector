@@ -15,7 +15,10 @@
 %% Exported functions
 %%--------------------------------------------------------------------
 %% @doc Starts the election process.
--spec elect(TimeType :: runtime | wall_clock, Direction :: high | low, CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
+-spec elect(TimeType :: runtime | wall_clock,
+            Direction :: high | low,
+            CandidateNodes :: [node()]) ->
+               Leader :: elector_strategy_behaviour:leader().
 elect(TimeType, Direction, CandidateNodes) ->
     CandidateRefs =
         [{Node, erpc:send_request(Node, fun() -> candidate_data(TimeType) end)}

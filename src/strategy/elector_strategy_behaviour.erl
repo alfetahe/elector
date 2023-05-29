@@ -34,17 +34,19 @@
 -spec elect() -> Leader :: leader().
 elect() ->
     CandidateNodes = candidate_nodes(),
-    erlang:apply(elector_config_handler:strategy_module(), elect, [CandidateNodes]).
-    
+    erlang:apply(
+        elector_config_handler:strategy_module(), elect, [CandidateNodes]).
+
 candidate_nodes() ->
-    NodeCandidationFun = fun()-> 
-        Pid = erlang:whereis(elector_candidate),
-        case Pid of
-            undefined ->
-                {ok, false};
-            _ ->
-                gen_server:call(Pid, is_candidate_node)
-        end
-    end,
+    NodeCandidationFun =
+        fun() ->
+           Pid = erlang:whereis(elector_candidate),
+           case Pid of
+               undefined ->
+                   {ok, false};
+               _ ->
+                   gen_server:call(Pid, is_candidate_node)
+           end
+        end,
     Responses = elector_service:async_call(NodeCandidationFun, [node() | nodes()]),
     [Node || {Node, {response, {ok, IsCandidate}}} <- Responses, IsCandidate =:= true].

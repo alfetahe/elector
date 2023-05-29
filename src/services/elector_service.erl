@@ -24,7 +24,7 @@ hook_exec({M, F, A}, Caller, Ref) ->
 
 %% @private
 iterate_hooks(_, false) ->
-    ok; 
+    ok;
 iterate_hooks([], _ExecuteHooks) ->
     ok;
 iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
@@ -41,18 +41,26 @@ iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
 %% @private
 pre_election(#{run_hooks := ExecuteHooks} = _Opts) ->
     Nodes = election_hook_nodes(),
-    Fun = fun() -> elector_service:iterate_hooks(elector_config_handler:pre_election_hooks(), ExecuteHooks) end,
+    Fun = fun() ->
+             elector_service:iterate_hooks(
+                 elector_config_handler:pre_election_hooks(), ExecuteHooks)
+          end,
     async_call(Fun, Nodes).
 
 %% @private
 post_election(#{run_hooks := ExecuteHooks} = _Opts) ->
     Nodes = election_hook_nodes(),
-    Fun = fun() -> elector_service:iterate_hooks(elector_config_handler:post_election_hooks(), ExecuteHooks) end,
+    Fun = fun() ->
+             elector_service:iterate_hooks(
+                 elector_config_handler:post_election_hooks(), ExecuteHooks)
+          end,
     async_call(Fun, Nodes).
 
-%% @private        
+%% @private
 election_hook_nodes() ->
-    case elector_config_handler:hooks_execution()    of
-        local -> [node()];
-        global -> [node() | nodes()]
-    end. 
+    case elector_config_handler:hooks_execution() of
+        local ->
+            [node()];
+        global ->
+            [node() | nodes()]
+    end.
