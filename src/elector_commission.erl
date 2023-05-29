@@ -6,7 +6,7 @@
 %% @private
 %% @end
 %%%-------------------------------------------------------------------
--module(elector_singleton).
+-module(elector_commission).
 
 %%--------------------------------------------------------------------
 %% Behaviours
@@ -16,7 +16,7 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([start_link/0]).
+-export([start_link/0, start/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 
 -type schedule_ref() :: undefined | reference().
@@ -34,6 +34,15 @@ start_link() ->
             {ok, Pid}
     end.
 
+start() ->
+    case gen_server:start({global, ?MODULE}, ?MODULE, #{}, []) of
+        {ok, Pid} ->
+            {ok, Pid};
+        {error, {already_started, Pid}} ->
+            {ok, Pid}
+    end.    
+
+
 %%--------------------------------------------------------------------
 %% Callback functions
 %%--------------------------------------------------------------------
@@ -50,11 +59,11 @@ handle_info({nodeup, _Node}, ScheduleRef) ->
     {noreply, schedule_election(ScheduleRef, undefined)};
 handle_info({nodedown, _Node}, ScheduleRef) ->
     {noreply, schedule_election(ScheduleRef, undefined)};
-handle_info(Msg, ScheduleRef) ->
-    logger:notice("Unexpected message received at elector singleton: "
-                  ++ io:format("~p", [Msg])),
+handle_info(_Msg, ScheduleRef) ->
     {noreply, ScheduleRef}.
 
+handle_call(get_leader, _From, State) ->
+    {reply, maps:get(leader_node, State), State};    
 handle_call(start_election, _From, _ScheduleRef) ->
     LeaderNode = elector_service:exec_election(#{run_hooks => true}),
     {reply, LeaderNode, undefined};

@@ -17,7 +17,7 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([start_link/0]).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, handle_continue/2]).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -31,19 +31,25 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init(_) ->
-    {ok, #{leader_node => undefined}}.
+    {ok, #{leader_node => undefined}, {continue, set_leader}}.
 
-handle_info(Msg, State) ->
-    logger:notice("Unexpected message received at elector state: " ++ io:format("~p", [Msg])),
+handle_continue(set_leader, State) ->
+    CommissionPid = elector_service:commission_pid(),
+    LeaderNode = case CommissionPid of
+        undefined ->
+            undefined;
+        _ ->
+            gen_server:call({global, elector_commission}, get_leader)
+    end,
+    {noreply, maps:put(leader_node, LeaderNode, State)}.
+
+handle_info(_Msg, State) ->
     {noreply, State}.
 
 handle_call({set_leader, LeaderNode}, _From, State) ->
     {reply, ok, maps:put(leader_node, LeaderNode, State)};
 handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};
-handle_call(elect_sync, _From, State) ->
-    LeaderNode = gen_server:call({global, elector_singleton}, start_election, 10000),
-    {reply, election_finished, maps:put(leader_node, LeaderNode, State)};
 handle_call(clear_leader, _From, State) ->
     {reply, {ok, leader_cleared}, maps:put(leader_node, undefined, State)};
 handle_call(Msg, _From, State) ->

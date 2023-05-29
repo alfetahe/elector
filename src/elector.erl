@@ -54,21 +54,21 @@ get_leader() ->
 -spec elect() ->
                {ok, election_msg_passed} |
                {error, quorum_size_not_met} |
-               {error, election_singleton_not_up}.
+               {error, election_commission_not_up}.
 elect() ->
-    SingletonPid = elector_service:singleton_pid(),
+    CommissionPid = elector_service:commission_pid(),
     QuorumRes = elector_config_handler:quorum_check(),
-    start_election(async, SingletonPid, QuorumRes).
+    start_election(async, CommissionPid, QuorumRes).
 
 %% @doc Starts an election synchronously.
 -spec elect_sync() ->
                     {ok, leader_node()} |
                     {error, quorum_size_not_met} |
-                    {error, election_singleton_not_up}.
+                    {error, election_commission_not_up}.
 elect_sync() ->
-    SingletonPid = elector_service:singleton_pid(),
+    CommissionPid = elector_service:commission_pid(),
     QuorumRes = elector_config_handler:quorum_check(),
-    start_election(sync, SingletonPid, QuorumRes).
+    start_election(sync, CommissionPid, QuorumRes).
 
 %% @doc Clears the leader node and sets it to undefined.
 -spec clear_leader() -> {ok, leader_cleared}.
@@ -86,13 +86,13 @@ clear_leader_sync() ->
 %%--------------------------------------------------------------------
 
 %% @private
-start_election(_Type, _SingletonPid, QuorumCheck) when QuorumCheck =:= false ->
+start_election(_Type, _CommissionPid, QuorumCheck) when QuorumCheck =:= false ->
     {error, quorum_size_not_met};
-start_election(_Type, SingletonPid, _QuorumCheck) when is_pid(SingletonPid) =:= false ->
-    {error, election_singleton_not_up};
-start_election(sync, SingletonPid, _QuorumCheck) ->
-    LeaderNode = gen_server:call(SingletonPid, start_election),
+start_election(_Type, CommissionPid, _QuorumCheck) when is_pid(CommissionPid) =:= false ->
+    {error, election_commission_not_up};
+start_election(sync, CommissionPid, _QuorumCheck) ->
+    LeaderNode = gen_server:call(CommissionPid, start_election),
     {ok, LeaderNode};
-start_election(async, SingletonPid, _QuorumCheck) ->
-    gen_server:cast(SingletonPid, start_election),
+start_election(async, CommissionPid, _QuorumCheck) ->
+    gen_server:cast(CommissionPid, start_election),
     {ok, election_msg_passed}.

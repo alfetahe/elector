@@ -32,10 +32,10 @@ handle_info(_, State) ->
     {noreply, State}.
 
 monitor_manager() ->
-    monitor(process, elector_service:singleton_pid()).
+    monitor(process, elector_service:commission_pid()).
 
 start_manager() ->
-    case elector_singleton:start_link() of
+    case elector_commission:start() of
         {ok, _} ->
             ok;
         {error, {already_started, _}} ->

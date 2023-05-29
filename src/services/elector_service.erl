@@ -1,9 +1,9 @@
 -module(elector_service).
 
--export([exec_election/1, hook_exec/3, singleton_pid/0]).
+-export([exec_election/1, hook_exec/3, commission_pid/0]).
 
-singleton_pid() ->
-    global:whereis_name(elector_singleton).
+commission_pid() ->
+    global:whereis_name(elector_commission).
 
 exec_election(Opts) ->
     ExecuteHooks = maps:get(run_hooks, Opts),
@@ -18,6 +18,8 @@ hook_exec({M, F, A}, Caller, Ref) ->
     Caller ! {hook_executed, Ref}.
 
 %% @private
+iterate_hooks(_, false) ->
+    ok; 
 iterate_hooks([], _ExecuteHooks) ->
     ok;
 iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
