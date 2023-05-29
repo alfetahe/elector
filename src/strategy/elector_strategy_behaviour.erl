@@ -46,7 +46,5 @@ candidate_nodes() ->
                 gen_server:call(Pid, is_candidate_node)
         end
     end,
-    CandidateRefs =
-        [{Node, erpc:send_request(Node, NodeCandidationFun)} || Node <- [node() | nodes()]],
-    Responses = [{Node, erpc:receive_response(Ref)} || {Node, Ref} <- CandidateRefs],
+    Responses = elector_service:async_call(NodeCandidationFun, [node() | nodes()]),
     [Node || {Node, {ok, IsCandidate}} <- Responses, IsCandidate =:= true].

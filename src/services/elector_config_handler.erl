@@ -7,14 +7,19 @@
 %%%-------------------------------------------------------------------
 -module(elector_config_handler).
 
+-include("elector_header.hrl").
+
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, pre_election_hooks/0, post_election_hooks/0,
-         startup_hooks_enabled/0, quorum_size/0, quorum_check/0, candidate_node/0]).
+         startup_hooks_enabled/0, quorum_size/0, quorum_check/0, candidate_node/0, hooks_execution/0]).
 
 candidate_node() ->
     application:get_env(elector, candidate_node, true).
+
+hooks_execution() ->
+    application:get_env(elector, hooks_execution, local).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -24,14 +29,14 @@ candidate_node() ->
 %% @end
 -spec election_delay() -> Delay :: integer().
 election_delay() ->
-    application:get_env(elector, election_delay, 1000).
+    application:get_env(elector, election_delay, ?ELECTION_DELAY).
 
 %% @doc Returns the configured strategy module.
 %% Default value is `elector_rt_high_strategy' (Node with the highest runtime).
 %% @end
 -spec strategy_module() -> StrategyModule :: module().
 strategy_module() ->
-    application:get_env(elector, strategy_module, elector_rt_high_strategy).
+    application:get_env(elector, strategy_module, ?DEFAULT_STRATEGY).
 
 %% @doc Returns the configured pre election hooks.
 %% Default value is `[]'.

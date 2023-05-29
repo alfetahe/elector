@@ -83,9 +83,8 @@ handle_cast(_msg, State) ->
 
 %% @private
 start_election(State) ->
-    LeaderNode = elector_service:exec_election(#{run_hooks => true}),
+    LeaderNode = elector_service:setup_election(#{run_hooks => true}),
     StateLeader   = maps:put(leader_node, LeaderNode, State),
-    gen_server:abcast([node() | nodes()], elector_state, {set_leader, LeaderNode}),
     maps:put(schedule_ref, maps:put(schedule_ref, undefined, State), StateLeader).
 
 %% @private
