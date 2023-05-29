@@ -74,4 +74,4 @@ handle_cast(_msg, state) ->
 
 %% @private
 schedule_checkup() ->
-    erlang:send_after(?UNDEFINED_LEADER_INTERV, self(), leader_checkup).    
+    erlang:send_after(?LEADER_CHECKUP_INTERV, self(), leader_checkup).    

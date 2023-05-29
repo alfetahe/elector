@@ -3,4 +3,5 @@
 -define(DEFAULT_STRATEGY, elector_rt_high_strategy).
 -define(ERPC_TIMEOUT, 5000).
 -define(HOOK_EXEC_TIMEOUT, 1000).
--define(UNDEFINED_LEADER_INTERV, 10000).
+-define(LEADER_CHECKUP_INTERV, 10000).
+-define(COMMISSION_CHECKUP_INTERV, 3000).
