@@ -8,7 +8,6 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
-
 init(_) ->
     {ok, #{}}.
 
@@ -17,6 +16,6 @@ handle_info(_Msg, State) ->
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
-
+    
 handle_call(_Msg, _From, State) ->
     {reply, ok, State}.

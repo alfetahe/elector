@@ -19,7 +19,8 @@
 -export([start_link/0, start/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 
--type schedule_ref() :: undefined | reference().
+-type election_schedule_ref() :: undefined | reference().
+-type state() :: #{schedule_ref => election_schedule_ref(), leader_node => node() | undefined}.
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -46,35 +47,37 @@ start() ->
 %%--------------------------------------------------------------------
 %% Callback functions
 %%--------------------------------------------------------------------
--spec init(any()) -> {ok, schedule_ref()}.
+-spec init(any()) -> {ok, state()}.
 init(_) ->
     net_kernel:monitor_nodes(true),
     SheduleRef = schedule_election(undefined, 0),
-    {ok, SheduleRef}.
+    {ok, #{schedule_ref => SheduleRef}}.
 
-handle_info(election_schedule, _ScheduleRef) ->
+handle_info(election_schedule, State) ->
     elector_service:exec_election(#{run_hooks => true}),
-    {noreply, undefined};
-handle_info({nodeup, _Node}, ScheduleRef) ->
-    {noreply, schedule_election(ScheduleRef, undefined)};
-handle_info({nodedown, _Node}, ScheduleRef) ->
-    {noreply, schedule_election(ScheduleRef, undefined)};
-handle_info(_Msg, ScheduleRef) ->
-    {noreply, ScheduleRef}.
+    {noreply, maps:put(schedule_ref, undefined, State)};
+handle_info({nodeup, _Node}, #{schedule_ref := Sr} = State) ->
+    NewState = maps:put(schedule_ref, schedule_election(Sr, undefined), State),
+    {noreply, NewState};
+handle_info({nodedown, _Node}, #{schedule_ref := Sr} = State) ->
+    NewState = maps:put(schedule_ref, schedule_election(Sr, undefined), State),
+    {noreply, NewState};
+handle_info(_Msg, State) ->
+    {noreply, State}.
 
 handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};    
-handle_call(start_election, _From, _ScheduleRef) ->
+handle_call(start_election, _From, State) ->
     LeaderNode = elector_service:exec_election(#{run_hooks => true}),
-    {reply, LeaderNode, undefined};
-handle_call(Msg, _From, ScheduleRef) ->
-    {reply, Msg, ScheduleRef}.
+    {reply, LeaderNode, maps:put(schedule_ref, undefined, State)};
+handle_call(Msg, _From, State) ->
+    {reply, Msg, State}.
 
-handle_cast(start_election, _ScheduleRef) ->
+handle_cast(start_election, State) ->
     elector_service:exec_election(#{run_hooks => true}),
-    {noreply, undefined};
-handle_cast(_msg, ScheduleRef) ->
-    {noreply, ScheduleRef}.
+    {noreply, maps:put(schedule_ref, undefined, State)};
+handle_cast(_msg, State) ->
+    {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
