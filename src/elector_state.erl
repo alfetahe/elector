@@ -13,6 +13,8 @@
 %%--------------------------------------------------------------------
 -behaviour(gen_server).
 
+-include("elector_header.hrl").
+
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
@@ -31,6 +33,7 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init(_) ->
+    schedule_checkup(),
     {ok, #{leader_node => undefined}, {continue, set_leader}}.
 
 handle_continue(set_leader, State) ->
@@ -43,6 +46,13 @@ handle_continue(set_leader, State) ->
     end,
     {noreply, maps:put(leader_node, LeaderNode, State)}.
 
+handle_info(leader_checkup, #{leader_node := undefined} = State) ->
+    schedule_checkup(),
+    gen_server:cast({global, elector_commission}, start_election),
+    {noreply, State};  
+handle_info(leader_checkup, State) ->
+    schedule_checkup(),
+    {noreply, State};  
 handle_info(_Msg, State) ->
     {noreply, State}.
 
@@ -61,3 +71,7 @@ handle_cast({set_leader, LeaderNode}, State) ->
     {noreply, maps:put(leader_node, LeaderNode, State)};
 handle_cast(_msg, state) ->
     {noreply, state}.
+
+%% @private
+schedule_checkup() ->
+    erlang:send_after(?UNDEFINED_LEADER_INTERV, self(), leader_checkup).    
