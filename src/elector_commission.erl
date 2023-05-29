@@ -51,11 +51,10 @@ start() ->
 init(_) ->
     net_kernel:monitor_nodes(true),
     SheduleRef = schedule_election(undefined, 0),
-    {ok, #{schedule_ref => SheduleRef}}.
+    {ok, #{schedule_ref => SheduleRef, leader_node => undefined}}.
 
 handle_info(election_schedule, State) ->
-    elector_service:exec_election(#{run_hooks => true}),
-    {noreply, maps:put(schedule_ref, undefined, State)};
+    {noreply, start_election(State)};
 handle_info({nodeup, _Node}, #{schedule_ref := Sr} = State) ->
     NewState = maps:put(schedule_ref, schedule_election(Sr, undefined), State),
     {noreply, NewState};
@@ -68,20 +67,26 @@ handle_info(_Msg, State) ->
 handle_call(get_leader, _From, State) ->
     {reply, maps:get(leader_node, State), State};    
 handle_call(start_election, _From, State) ->
-    LeaderNode = elector_service:exec_election(#{run_hooks => true}),
-    {reply, LeaderNode, maps:put(schedule_ref, undefined, State)};
+    #{leader_node := LeaderNode} = NewState = start_election(State),
+    {reply, LeaderNode, NewState};
 handle_call(Msg, _From, State) ->
     {reply, Msg, State}.
 
 handle_cast(start_election, State) ->
-    elector_service:exec_election(#{run_hooks => true}),
-    {noreply, maps:put(schedule_ref, undefined, State)};
+    {noreply, start_election(State)};
 handle_cast(_msg, State) ->
     {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
+
+%% @private
+start_election(State) ->
+    LeaderNode = elector_service:exec_election(#{run_hooks => true}),
+    StateLeader   = maps:put(leader_node, LeaderNode, State),
+    gen_server:abcast([node() | nodes()], elector_state, {set_leader, LeaderNode}),
+    maps:put(schedule_ref, maps:put(schedule_ref, undefined, State), StateLeader).
 
 %% @private
 schedule_election(ScheduleRef, _Delay) when is_reference(ScheduleRef) ->
