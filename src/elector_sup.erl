@@ -32,11 +32,12 @@ start_link() ->
 %% Callback functions
 %%--------------------------------------------------------------------
 init([]) ->
-    ElectionWorker = #{id => elector_state, start => {elector_state, start_link, []}},
+    Candidate = #{id => elector_candidate, start => {elector_candidate, start_link, []}},
+    ElectionState = #{id => elector_state, start => {elector_state, start_link, []}},
     CommissionOverviewer =
-        #{id => elector_overviewer, start => {elector_overviewer, start_link, []}},
+        #{id => elector_overviewer, start => {elector_overviewer, start_link, []}},    
 
     SupFlags = #{strategy => one_for_all, intensity => 0, period => 1},
-    ChildSpecs = [ElectionWorker, CommissionOverviewer],
+    ChildSpecs = [Candidate, ElectionState, CommissionOverviewer],
 
     {ok, {SupFlags, ChildSpecs}}.
