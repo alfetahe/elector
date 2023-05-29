@@ -47,4 +47,4 @@ candidate_nodes() ->
         end
     end,
     Responses = elector_service:async_call(NodeCandidationFun, [node() | nodes()]),
-    [Node || {Node, {ok, IsCandidate}} <- Responses, IsCandidate =:= true].
+    [Node || {Node, {response, {ok, IsCandidate}}} <- Responses, IsCandidate =:= true].
