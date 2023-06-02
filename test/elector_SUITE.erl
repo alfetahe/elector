@@ -1,6 +1,5 @@
 -module(elector_SUITE).
 
--include_lib("eunit/include/eunit.hrl").
 -include_lib("common_test/include/ct.hrl").
 
 -behaviour(ct_suite).
@@ -26,43 +25,47 @@ end_per_suite(_Config) ->
     ok.
 
 test_is_leader(_Config) ->
-    ?assert(elector:is_leader() =:= {ok, true}),
+    {ok, true} = elector:is_leader(),
     {ok, Peer, _Node} = peer_node_setup(),
     elector:elect_sync(),
-    ?assert(elector:is_leader() =:= {ok, false}),
+    {ok, false} = elector:is_leader(),
     peer_node_teardown(Peer).
 
 test_get_leader(_Config) ->
-    ?assert(elector:get_leader() =:= {ok, node()}),
+    LocalNode = node(),
+    {ok, LocalNode} = elector:get_leader(),
     {ok, Peer, Node} = peer_node_setup(),
     elector:elect_sync(),
-    ?assert(elector:get_leader() =:= {ok, Node}),
+    {ok, Node} = elector:get_leader(),
     peer_node_teardown(Peer).
 
 test_elect_sync(_Config) ->
-    ?assert(elector:elect_sync() =:= {ok, election_finished}),
-    ?assert(elector:get_leader() =:= {ok, node()}).
+    Node = node(),
+    {ok, election_finished} = elector:elect_sync(),
+    {ok, Node} = elector:get_leader().
 
 test_elect(_Config) ->
     elector:clear_leader(),
-    ?assert(elector:get_leader() =:= {ok, undefined}),
+    {ok, undefined} = elector:get_leader(),
     application:set_env(elector, election_delay, 0),
     application:set_env(elector,
                         post_election_hooks,
                         [{erlang, send, [self(), election_finished]}]),
-    ?assert(elector:elect() =:= {ok, election_started}),
+    {ok, election_started} = elector:elect(),
     receive
         election_finished ->
-            ?assert(elector:get_leader() =:= {ok, node()})
+            Node = node(),
+            {ok, Node} = elector:get_leader()
     after 2000 ->
-        ?assert(false)
+        throw(timeout)
     end.
 
 test_clear_leader(_Config) ->
     elector:elect_sync(),
-    ?assert(elector:get_leader() =:= {ok, node()}),
+    Node = node(),
+    {ok, Node} = elector:get_leader(),
     elector:clear_leader(),
-    ?assert(elector:get_leader() =:= {ok, undefined}).
+    {ok, undefined} = elector:get_leader().
 
 peer_node_setup() ->
     Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
