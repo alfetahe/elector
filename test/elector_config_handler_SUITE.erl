@@ -85,10 +85,11 @@ test_quorum_size(_Config) ->
 test_quorum_check(_Config) ->
     application:set_env(elector, quorum_size, 1),
     true = elector_config_handler:quorum_check(),
-    application:set_env(elector, quorum_size, 2),
+    application:set_env(elector, quorum_size, 100),
     false = elector_config_handler:quorum_check(),
     Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
     {ok, Peer, _Node} = ?CT_PEER(Paths),
+    application:set_env(elector, quorum_size, 2),
     true = elector_config_handler:quorum_check(),
     peer:stop(Peer).
 
