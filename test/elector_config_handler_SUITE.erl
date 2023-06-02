@@ -79,8 +79,8 @@ test_startup_hooks_enabled(_Config) ->
     false = elector_config_handler:startup_hooks_enabled().
 
 test_quorum_size(_Config) ->
-    application:set_env(elector, quorum_size, 2),
-    2 = elector_config_handler:quorum_size().
+    application:set_env(elector, quorum_size, 5),
+    5 = elector_config_handler:quorum_size().
 
 test_quorum_check(_Config) ->
     application:set_env(elector, quorum_size, 1),
