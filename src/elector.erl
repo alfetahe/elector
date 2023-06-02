@@ -20,11 +20,9 @@
 %%--------------------------------------------------------------------
 %% Exported API
 %%--------------------------------------------------------------------
--export([is_leader/0, elect/0, elect_sync/0, get_leader/0, clear_leader/0,
-         clear_leader_sync/0]).
+-export([is_leader/0, elect/0, elect_sync/0, get_leader/0, clear_leader/0]).
 
 -type leader_node() :: node() | undefined.
--type node_responses() :: {list(), list()}.
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -52,7 +50,7 @@ get_leader() ->
 
 %% @doc Starts an election asynchronously.
 -spec elect() ->
-               {ok, election_msg_passed} |
+               {ok, async_election_started} |
                {error, quorum_size_not_met} |
                {error, election_commission_not_up}.
 elect() ->
@@ -76,11 +74,6 @@ clear_leader() ->
     gen_server:abcast([node() | nodes()], elector_state, clear_leader),
     {ok, leader_cleared}.
 
-%% @doc Clears the leader node and sets it to undefined.
--spec clear_leader_sync() -> {ok, node_responses()}.
-clear_leader_sync() ->
-    {ok, gen_server:multi_call([node() | nodes()], elector_state, clear_leader)}.
-
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
@@ -95,4 +88,4 @@ start_election(sync, CommissionPid, _QuorumCheck) ->
     {ok, LeaderNode};
 start_election(async, CommissionPid, _QuorumCheck) ->
     gen_server:cast(CommissionPid, start_election),
-    {ok, election_msg_passed}.
+    {ok, async_election_started}.

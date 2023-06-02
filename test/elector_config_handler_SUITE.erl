@@ -11,14 +11,14 @@
 
 all() ->
     [test_election_delay,
-    test_strategy_module,
-    test_pre_election_hooks,
-    test_post_election_hooks,
-    test_startup_hooks_enabled,
-    test_quorum_size,
-    test_quorum_check,
-    test_candidate_node,
-    test_hooks_execution].
+     test_strategy_module,
+     test_pre_election_hooks,
+     test_post_election_hooks,
+     test_startup_hooks_enabled,
+     test_quorum_size,
+     test_quorum_check,
+     test_candidate_node,
+     test_hooks_execution].
 
 init_per_suite(Config) ->
     application:ensure_started(elector),
