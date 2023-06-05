@@ -5,10 +5,11 @@
 -behaviour(ct_suite).
 
 -export([all/0]).
--export([test_commission_pid/1, test_hook_exec/1, test_async_call/1]).
+-export([test_commission_pid/1, test_hook_exec/1, test_async_call/1,
+         test_iterate_hooks/1]).
 
-all() -> 
-    [test_commission_pid, test_hook_exec, test_async_call].
+all() ->
+    [test_commission_pid, test_hook_exec, test_async_call, test_iterate_hooks].
 
 test_commission_pid(_Config) ->
     CommissionPid = elector_service:commission_pid(),
@@ -31,6 +32,25 @@ test_async_call(_Config) ->
     Responses = elector_service:async_call(ExampleFun, [node(), Node]),
     true = lists:all(fun({_N, {response, Res}}) -> Res =:= ok end, Responses),
     peer_node_teardown(Peer).
+
+test_iterate_hooks(_Config) ->
+    Pid = self(),
+    ok = elector_service:iterate_hooks([{erlang, send, [Pid, test]}], false),
+    false =
+        receive
+            test ->
+                true
+        after 0 ->
+            false
+        end,
+    ok = elector_service:iterate_hooks([{erlang, send, [Pid, test]}], true),
+    true =
+        receive
+            test ->
+                true
+        after 0 ->
+            false
+        end.
 
 peer_node_setup() ->
     ?CT_PEER(["-pa", code:lib_dir(elector) ++ "/ebin", "-connect_all", "false"]).

@@ -2,7 +2,7 @@
 
 -include("elector_header.hrl").
 
--export([setup_election/1, hook_exec/3, iterate_hooks/2, commission_pid/0, async_call/2]).
+-export([setup_election/1, hook_exec/3, commission_pid/0, async_call/2, iterate_hooks/2]).
 
 commission_pid() ->
     global:whereis_name(elector_commission).
@@ -22,7 +22,6 @@ hook_exec({M, F, A}, Caller, Ref) ->
     erlang:apply(M, F, A),
     Caller ! {hook_executed, Ref}.
 
-%% @private
 iterate_hooks(_, false) ->
     ok;
 iterate_hooks([], _ExecuteHooks) ->
@@ -34,7 +33,7 @@ iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
         {hook_executed, Ref} ->
             ok
     after ?HOOK_EXEC_TIMEOUT ->
-        error
+        throw({error, hook_exec_timeout, Mfa})
     end,
     iterate_hooks(Hooks, ExecuteHooks).
 
