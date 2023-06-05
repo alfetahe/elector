@@ -14,13 +14,16 @@
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, pre_election_hooks/0, post_election_hooks/0,
          startup_hooks_enabled/0, quorum_size/0, quorum_check/0, candidate_node/0,
-         hooks_execution/0]).
+         hooks_execution/0, automatic_elections/0]).
 
 candidate_node() ->
     application:get_env(elector, candidate_node, true).
 
 hooks_execution() ->
     application:get_env(elector, hooks_execution, local).
+
+automatic_elections() ->
+    application:get_env(elector, automatic_elections, true).
 
 %%--------------------------------------------------------------------
 %% Exported functions

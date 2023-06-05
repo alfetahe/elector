@@ -89,10 +89,17 @@ start_election(State) ->
 
 %% @private
 schedule_election(ScheduleRef, _Delay) when is_reference(ScheduleRef) ->
-    ScheduleRef;
+    AutomaticElection = elector_config_handler:automatic_elections(),
+    case AutomaticElection of
+        true ->
+            ScheduleRef;
+        false ->
+            undefined
+    end;
 schedule_election(_ScheduleRef, Delay) ->
     QuorumCheck = elector_config_handler:quorum_check(),
-    case QuorumCheck of
+    AutomaticElection = elector_config_handler:automatic_elections(),
+    case QuorumCheck andalso AutomaticElection of
         true ->
             send_election_msg(Delay);
         false ->

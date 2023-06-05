@@ -7,7 +7,8 @@
 -export([all/0, init_per_suite/1, end_per_suite/1]).
 -export([test_election_delay/1, test_strategy_module/1, test_pre_election_hooks/1,
          test_post_election_hooks/1, test_startup_hooks_enabled/1, test_quorum_size/1,
-         test_quorum_check/1, test_candidate_node/1, test_hooks_execution/1]).
+         test_quorum_check/1, test_candidate_node/1, test_hooks_execution/1,
+         test_automatic_elections/1]).
 
 all() ->
     [test_election_delay,
@@ -18,7 +19,8 @@ all() ->
      test_quorum_size,
      test_quorum_check,
      test_candidate_node,
-     test_hooks_execution].
+     test_hooks_execution,
+     test_automatic_elections].
 
 init_per_suite(Config) ->
     application:ensure_started(elector),
@@ -104,3 +106,10 @@ test_hooks_execution(_Config) ->
     global = elector_config_handler:hooks_execution(),
     application:set_env(elector, hooks_execution, local),
     local = elector_config_handler:hooks_execution().
+
+test_automatic_elections(_Config) ->
+    true = elector_config_handler:automatic_elections(),
+    application:set_env(elector, automatic_elections, false),
+    false = elector_config_handler:automatic_elections(),
+    application:set_env(elector, automatic_elections, true),
+    true = elector_config_handler:automatic_elections().
