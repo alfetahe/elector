@@ -6,7 +6,8 @@
 
 -export([all/0]).
 -export([test_commission_pid/1, test_hook_exec/1, test_async_call/1, test_iterate_hooks/1,
-         test_setup_election_local/1, test_setup_election_global/1, test_setup_election_nohooks/1]).
+         test_setup_election_local/1, test_setup_election_global/1,
+         test_setup_election_nohooks/1]).
 
 all() ->
     [test_commission_pid,
@@ -157,7 +158,7 @@ test_setup_election_global(_Config) ->
     peer_node_teardown(Peer).
 
 test_setup_election_nohooks(_Config) ->
-        Pid = self(),
+    Pid = self(),
     {ok, Peer, PeerNode} = peer_node_setup(),
     NodeSetupFun =
         fun() ->
