@@ -1,26 +1,25 @@
 -module(elector_rt_high_strategy_SUITE).
 
 -include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
 
 -behaviour(ct_suite).
 
 -export([all/0]).
--export([init_per_testcase/2, end_per_testcase/2]).
 -export([test_elect/1]).
 
 all() ->
     [test_elect].
 
-init_per_testcase(_TestCase, Config) ->
-    Paths = lists:append([["-pa", code:lib_dir(elector) ++ "/ebin"]]),
-    {ok, Peer, Node} = ?CT_PEER(Paths),
-    [{peer_node, {Peer, Node}} | Config].
-
-end_per_testcase(_TestCase, Config) ->
-    {Peer, _Node} = ?config(peer_node, Config),
-    peer:stop(Peer).
-
 test_elect(_Config) ->
-    SelectedNode = elector_rt_high_strategy:elect(),
-    ?assert(SelectedNode =:= node()).
+    {ok, Peer, PeerNode} = ?CT_PEER(["-pa", code:lib_dir(elector) ++ "/ebin", "-connect_all", "false"]),
+        NodeSetupFun =
+        fun() ->
+            application:set_env(elector, automatic_elections, false),
+            application:ensure_started(elector)
+        end,
+    [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
+
+    CandidateNodes = elector_strategy_behaviour:candidate_nodes(),
+    SelectedNode = elector_rt_high_strategy:elect(CandidateNodes),
+    SelectedNode = node(),
+    peer:stop(Peer).
