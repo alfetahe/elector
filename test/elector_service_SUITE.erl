@@ -5,11 +5,16 @@
 -behaviour(ct_suite).
 
 -export([all/0]).
--export([test_commission_pid/1, test_hook_exec/1, test_async_call/1,
-         test_iterate_hooks/1]).
+-export([test_commission_pid/1, test_hook_exec/1, test_async_call/1, test_iterate_hooks/1,
+         test_setup_election_local/1, test_setup_election_global/1]).
 
 all() ->
-    [test_commission_pid, test_hook_exec, test_async_call, test_iterate_hooks].
+    [test_commission_pid,
+     test_hook_exec,
+     test_async_call,
+     test_iterate_hooks,
+     test_setup_election_local,
+     test_setup_election_global].
 
 test_commission_pid(_Config) ->
     CommissionPid = elector_service:commission_pid(),
@@ -51,6 +56,104 @@ test_iterate_hooks(_Config) ->
         after 0 ->
             false
         end.
+
+test_setup_election_local(_Config) ->
+    Pid = self(),
+    {ok, Peer, PeerNode} = peer_node_setup(),
+    NodeSetupFun =
+        fun() ->
+           application:set_env(elector, automatic_elections, false),
+           application:set_env(elector, pre_election_hooks, [{erlang, send, [Pid, pre_election]}]),
+           application:set_env(elector,
+                               post_election_hooks,
+                               [{erlang, send, [Pid, post_election]}]),
+           application:set_env(elector, hooks_execution, local),
+           application:ensure_started(elector)
+        end,
+    [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
+
+    LeaderNode = elector_service:setup_election(#{run_hooks => true}),
+
+    NodeCheckupFun =
+        fun() ->
+           {ok, LeaderNode} = elector:get_leader(),
+           true
+        end,
+
+    Responses = [erpc:call(Node, NodeCheckupFun) || Node <- [node(), PeerNode]],
+    true = lists:all(fun(Resp) -> Resp =:= true end, Responses),
+
+    HooksTestFun =
+        fun(MatchType) ->
+           MatchType =
+               receive
+                   pre_election ->
+                       true
+               after 0 ->
+                   false
+               end,
+           MatchType =
+               receive
+                   post_election ->
+                       true
+               after 0 ->
+                   false
+               end,
+           true
+        end,
+    HookResponses = [HooksTestFun(MatchType) || MatchType <- [true, false]],
+    true = lists:all(fun(Resp) -> Resp =:= true end, HookResponses),
+
+    peer_node_teardown(Peer).
+
+test_setup_election_global(_Config) ->
+    Pid = self(),
+    {ok, Peer, PeerNode} = peer_node_setup(),
+    NodeSetupFun =
+        fun() ->
+           application:ensure_started(elector),
+           application:set_env(elector, automatic_elections, false),
+           application:set_env(elector, pre_election_hooks, [{erlang, send, [Pid, pre_election]}]),
+           application:set_env(elector,
+                               post_election_hooks,
+                               [{erlang, send, [Pid, post_election]}]),
+           application:set_env(elector, hooks_execution, global)
+        end,
+    [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
+
+    LeaderNode = elector_service:setup_election(#{run_hooks => true}),
+
+    NodeCheckupFun =
+        fun() ->
+           {ok, LeaderNode} = elector:get_leader(),
+           true
+        end,
+
+    Responses = [erpc:call(Node, NodeCheckupFun) || Node <- [node(), PeerNode]],
+    true = lists:all(fun(Resp) -> Resp =:= true end, Responses),
+
+    HooksTestFun =
+        fun(MatchType) ->
+           MatchType =
+               receive
+                   pre_election ->
+                       true
+               after 0 ->
+                   false
+               end,
+           MatchType =
+               receive
+                   post_election ->
+                       true
+               after 0 ->
+                   false
+               end,
+           true
+        end,
+    HookResponses = [HooksTestFun(MatchType) || MatchType <- [true, true]],
+    true = lists:all(fun(Resp) -> Resp =:= true end, HookResponses),
+
+    peer_node_teardown(Peer).
 
 peer_node_setup() ->
     ?CT_PEER(["-pa", code:lib_dir(elector) ++ "/ebin", "-connect_all", "false"]).
