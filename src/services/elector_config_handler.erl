@@ -14,7 +14,8 @@
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, pre_election_hooks/0, post_election_hooks/0,
          startup_hooks_enabled/0, quorum_size/0, quorum_check/0, candidate_node/0,
-         hooks_execution/0, automatic_elections/0]).
+         hooks_execution/0, automatic_elections/0, add_pre_election_hook/3,
+         add_post_election_hook/3, rem_pre_election_hook/3, rem_post_election_hook/3]).
 
 candidate_node() ->
     application:get_env(elector, candidate_node, true).
@@ -24,6 +25,26 @@ hooks_execution() ->
 
 automatic_elections() ->
     application:get_env(elector, automatic_elections, true).
+
+add_pre_election_hook(Module, Function, Args) ->
+    application:set_env(elector,
+                        pre_election_hooks,
+                        [{Module, Function, Args} | pre_election_hooks()]).
+
+add_post_election_hook(Module, Function, Args) ->
+    application:set_env(elector,
+                        post_election_hooks,
+                        [{Module, Function, Args} | post_election_hooks()]).
+
+rem_pre_election_hook(Module, Function, Args) ->
+    application:set_env(elector,
+                        pre_election_hooks,
+                        remove_hook(Module, Function, Args, pre_election_hooks())).
+
+rem_post_election_hook(Module, Function, Args) ->
+    application:set_env(elector,
+                        post_election_hooks,
+                        remove_hook(Module, Function, Args, post_election_hooks())).
 
 %%--------------------------------------------------------------------
 %% Exported functions
@@ -85,3 +106,8 @@ quorum_check() ->
         _ ->
             Quorum =< length([node() | nodes()])
     end.
+
+%% private
+remove_hook(Module, Function, Args, Hooks) ->
+    lists:filter(fun({M, F, A}) -> M =/= Module orelse F =/= Function orelse A =/= Args end,
+                 Hooks).
