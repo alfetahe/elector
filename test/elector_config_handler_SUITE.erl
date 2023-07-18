@@ -146,5 +146,5 @@ test_rem_post_election_hook(_Config) ->
     {M, F, A} = lists:nth(1, TestHooks),
     application:set_env(elector, post_election_hooks, TestHooks),
     {ok, TestHooks} = application:get_env(elector, post_election_hooks),
-    elector_config_handler:rem_pre_election_hook(M, F, A),
+    elector_config_handler:rem_post_election_hook(M, F, A),
     {ok, []} = application:get_env(elector, post_election_hooks).
