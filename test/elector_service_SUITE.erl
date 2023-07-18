@@ -64,13 +64,15 @@ test_setup_election_local(_Config) ->
     {ok, Peer, PeerNode} = peer_node_setup(),
     NodeSetupFun =
         fun() ->
+           application:ensure_started(elector),
            application:set_env(elector, automatic_elections, false),
-           application:set_env(elector, pre_election_hooks, [{erlang, send, [Pid, pre_election]}]),
+           application:set_env(elector,
+                               pre_election_hooks,
+                               [{erlang, send, [Pid, pre_election_local]}]),
            application:set_env(elector,
                                post_election_hooks,
-                               [{erlang, send, [Pid, post_election]}]),
-           application:set_env(elector, hooks_execution, local),
-           application:ensure_started(elector)
+                               [{erlang, send, [Pid, post_election_local]}]),
+           application:set_env(elector, hooks_execution, local)
         end,
     [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
 
@@ -89,14 +91,14 @@ test_setup_election_local(_Config) ->
         fun(MatchType) ->
            MatchType =
                receive
-                   pre_election ->
+                   pre_election_local ->
                        true
                after 0 ->
                    false
                end,
            MatchType =
                receive
-                   post_election ->
+                   post_election_local ->
                        true
                after 0 ->
                    false
@@ -115,10 +117,12 @@ test_setup_election_global(_Config) ->
         fun() ->
            application:ensure_started(elector),
            application:set_env(elector, automatic_elections, false),
-           application:set_env(elector, pre_election_hooks, [{erlang, send, [Pid, pre_election]}]),
+           application:set_env(elector,
+                               pre_election_hooks,
+                               [{erlang, send, [Pid, pre_election_global]}]),
            application:set_env(elector,
                                post_election_hooks,
-                               [{erlang, send, [Pid, post_election]}]),
+                               [{erlang, send, [Pid, post_election_global]}]),
            application:set_env(elector, hooks_execution, global)
         end,
     [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
@@ -138,14 +142,14 @@ test_setup_election_global(_Config) ->
         fun(MatchType) ->
            MatchType =
                receive
-                   pre_election ->
+                   pre_election_global ->
                        true
                after 0 ->
                    false
                end,
            MatchType =
                receive
-                   post_election ->
+                   post_election_global ->
                        true
                after 0 ->
                    false
@@ -164,10 +168,12 @@ test_setup_election_nohooks(_Config) ->
         fun() ->
            application:ensure_started(elector),
            application:set_env(elector, automatic_elections, false),
-           application:set_env(elector, pre_election_hooks, [{erlang, send, [Pid, pre_election]}]),
+           application:set_env(elector,
+                               pre_election_hooks,
+                               [{erlang, send, [Pid, pre_election_nohooks]}]),
            application:set_env(elector,
                                post_election_hooks,
-                               [{erlang, send, [Pid, post_election]}]),
+                               [{erlang, send, [Pid, post_election_nohooks]}]),
            application:set_env(elector, hooks_execution, global)
         end,
     [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
@@ -187,14 +193,14 @@ test_setup_election_nohooks(_Config) ->
         fun(MatchType) ->
            MatchType =
                receive
-                   pre_election ->
+                   pre_election_nohooks ->
                        true
                after 0 ->
                    false
                end,
            MatchType =
                receive
-                   post_election ->
+                   post_election_nohooks ->
                        true
                after 0 ->
                    false
