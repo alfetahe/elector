@@ -8,7 +8,8 @@
 -export([test_election_delay/1, test_strategy_module/1, test_pre_election_hooks/1,
          test_post_election_hooks/1, test_startup_hooks_enabled/1, test_quorum_size/1,
          test_quorum_check/1, test_candidate_node/1, test_hooks_execution/1,
-         test_automatic_elections/1]).
+         test_automatic_elections/1, test_add_pre_election_hook/1, test_add_post_election_hook/1,
+         test_rem_pre_election_hook/1, test_rem_post_election_hook/1]).
 
 all() ->
     [test_election_delay,
@@ -20,7 +21,11 @@ all() ->
      test_quorum_check,
      test_candidate_node,
      test_hooks_execution,
-     test_automatic_elections].
+     test_automatic_elections,
+     test_add_pre_election_hook,
+     test_add_post_election_hook,
+     test_rem_pre_election_hook,
+     test_rem_post_election_hook].
 
 init_per_suite(Config) ->
     application:ensure_started(elector),
@@ -113,3 +118,33 @@ test_automatic_elections(_Config) ->
     false = elector_config_handler:automatic_elections(),
     application:set_env(elector, automatic_elections, true),
     true = elector_config_handler:automatic_elections().
+
+test_add_pre_election_hook(_Config) ->
+    application:set_env(elector, pre_election_hooks, []),
+    elector_config_handler:add_pre_election_hook(pre_module1, test_func1, [1]),
+    elector_config_handler:add_pre_election_hook(pre_module2, test_func2, [2]),
+    {ok, Hooks} = application:get_env(elector, pre_election_hooks),
+    [{pre_module2, test_func2, [2]}, {pre_module1, test_func1, [1]}] = Hooks.
+
+test_add_post_election_hook(_Config) ->
+    application:set_env(elector, post_election_hooks, []),
+    elector_config_handler:add_post_election_hook(post_module1, test_func1, [1]),
+    elector_config_handler:add_post_election_hook(post_module2, test_func2, [2]),
+    {ok, Hooks} = application:get_env(elector, post_election_hooks),
+    [{post_module2, test_func2, [2]}, {post_module1, test_func1, [1]}] = Hooks.
+
+test_rem_pre_election_hook(_Config) ->
+    TestHooks = elector_test_helper:test_hook(pre),
+    {M, F, A} = lists:nth(1, TestHooks),
+    application:set_env(elector, pre_election_hooks, TestHooks),
+    {ok, TestHooks} = application:get_env(elector, pre_election_hooks),
+    elector_config_handler:rem_pre_election_hook(M, F, A),
+    {ok, []} = application:get_env(elector, pre_election_hooks).
+
+test_rem_post_election_hook(_Config) ->
+    TestHooks = elector_test_helper:test_hook(post),
+    {M, F, A} = lists:nth(1, TestHooks),
+    application:set_env(elector, post_election_hooks, TestHooks),
+    {ok, TestHooks} = application:get_env(elector, post_election_hooks),
+    elector_config_handler:rem_pre_election_hook(M, F, A),
+    {ok, []} = application:get_env(elector, post_election_hooks).
