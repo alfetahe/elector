@@ -12,7 +12,7 @@
 <h1>Module elector_strategy_behaviour</h1>
 <ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Defines the base behaviour for election strategies.
 
-<p><b>This module defines the <tt>elector_strategy_behaviour</tt> behaviour.</b><br> Required callback functions: <tt>elect/0</tt>.</p>
+<p><b>This module defines the <tt>elector_strategy_behaviour</tt> behaviour.</b><br> Required callback functions: <tt>elect/1</tt>.</p>
 
 <h2><a name="description">Description</a></h2>Defines the base behaviour for election strategies.
 <h2><a name="types">Data Types</a></h2>
@@ -22,11 +22,18 @@
 
 
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#elect-0">elect/0</a></td><td>Starts the election process by triggering the strategy
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#candidate_nodes-0">candidate_nodes/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#elect-0">elect/0</a></td><td>Starts the election process by triggering the strategy
   modules elect() function.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="candidate_nodes-0">candidate_nodes/0</a></h3>
+<div class="spec">
+<p><tt>candidate_nodes() -&gt; any()</tt></p>
+<p> </p>
+</div>
 
 <h3 class="function"><a name="elect-0">elect/0</a></h3>
 <div class="spec">

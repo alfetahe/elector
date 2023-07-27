@@ -1,3 +1,4 @@
 %% encoding: UTF-8
 {application,elector}.
-{modules,[elector,elector_strategy_behaviour]}.
+{modules,[elector,elector_candidate,elector_service,
+          elector_strategy_behaviour]}.

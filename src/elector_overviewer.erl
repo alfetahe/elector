@@ -1,3 +1,9 @@
+%%%-----------------------------------------------------------------------------
+%% @doc Module responsible for starting the commission process globally and
+%% monitor it.
+%% @private
+%% @end
+%%%-----------------------------------------------------------------------------
 -module(elector_overviewer).
 
 -behaviour(gen_server).

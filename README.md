@@ -11,7 +11,7 @@ The default election strategy is to choose the node with the highest runtime.
 
 ## Features
 - Automatic election process on startup or when node joins/leaves the cluster
-- Ability to configure pre and post election hooks that will be called before and after the election process
+- Ability to configure pre and post election hooks that will be called before and after the election process. <strong>These hooks must return within 1 second to avoid timeouts</strong>.
 - Provides 2 built in election strategies and allows you to use your own strategy implementation (See `elector_strategy_behaviour` module for reference`)
 - Provides quorum option to detect split brain scenarios
 - Provides option to define the election delay in milliseconds before the election process is started automatically and queue the
@@ -27,6 +27,11 @@ a list of tuples with the following format: `{Module, Function, Args}`. Default 
 `post_election_hooks` - A list of hooks/function calls that will be triggered exactly after the election process. Expects
 a list of tuples with the following format: `{Module, Function, Args}`. Default value is `[]`.
 - `quorum_size` - The number of nodes(including the local node) that should be available in the cluster before the election process is started. Do not set it to `0` as it will disable the election process, leave empty or `1` if you want to run the election process even there are no other nodes in the cluster. Default value is `1`. 
+- `candidate_node` - Boolean indicating if this node should be a candidate for the leader election. Default value is `true`.
+- `hooks_execution` - Atom indicating if the pre and post election hooks should be executed on the node starting the election process or on all nodes. The election process will be started automatically by the global commission process. The node who starts the commission process is not known and can be any node in the cluster. 
+Available values are: `local` and `global`.
+Default value is `global`.
+- `automatic_elections` - Boolean indicating if the automatic election process should be started when node joins or leaves the cluster. Default value is `true`.
 
 Keep in mind to use the same configuration for all nodes in the cluster!
 

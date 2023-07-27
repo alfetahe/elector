@@ -1,5 +1,30 @@
 # Change log
 
+## v0.3.0 - 2023.07.28
+This is breaking change release. It is recommended to restart the
+elector application on all nodes after upgrading to this version.
+
+### Update rebar.config deps list: 
+```{deps, [{elector, "0.3.0"}]}.```
+
+### Changed:
+- The previous implementation started the election process on all nodes. The new version utilizes a global process(singleton) named 'commission' which will initiate the election and gathers information from the cluster. Based on this information, the 'commission' process will determine the leader node.
+
+The gathered information will then be propagated to all other nodes in the cluster. This significant change grants us better control over the election process and helps reduce bandwidth usage.
+
+### Added
+- `candidate_node` configuration option which will allow us to leave the node out of the election process. Default value is `true`.
+- `hooks_execution` - configuration option which defines if the hooks should be executed on all nodes or only on the commission node. Default value is `global`.
+- `automatic_elections` configuration option which will allow us to disable the automatic election process started by the commission when node joins or leaves the cluster. Default value is `true`.
+- `elector_config_handler:add_pre_election_hook/3` - function to add new pre election hook.
+- `elector_config_handler:add_post_election_hook/3` - function to add new post election hook.
+- `elector_config_handler:remove_pre_election_hook/3` - function to remove pre election hook.
+- `elector_config_handler:remove_post_election_hook/3` - function to remove post election hook.
+
+
+### Removed
+- `startup_hooks_enabled` configuration option
+
 ## v0.2.2 - 2023.04.02
 ### Update rebar.config deps list: 
 ```{deps, [{elector, "0.2.2"}]}.```

@@ -1,17 +1,17 @@
-%%%-------------------------------------------------------------------
+%%%-----------------------------------------------------------------------------
 %% @doc Module responsible for handling configuration.
 %% These settings can be altered with custom settings in the
 %% application environment.
 %% @private
 %% @end
-%%%-------------------------------------------------------------------
+%%%-----------------------------------------------------------------------------
 -module(elector_config_handler).
 
 -include("elector_header.hrl").
 
-%%--------------------------------------------------------------------
+%%------------------------------------------------------------------------------
 %% Exported API
-%%--------------------------------------------------------------------
+%%------------------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, pre_election_hooks/0, post_election_hooks/0,
          quorum_size/0, quorum_check/0, candidate_node/0, hooks_execution/0, automatic_elections/0,
          add_pre_election_hook/3, add_post_election_hook/3, rem_pre_election_hook/3,
@@ -21,7 +21,7 @@ candidate_node() ->
     application:get_env(elector, candidate_node, true).
 
 hooks_execution() ->
-    application:get_env(elector, hooks_execution, local).
+    application:get_env(elector, hooks_execution, global).
 
 automatic_elections() ->
     application:get_env(elector, automatic_elections, true).
