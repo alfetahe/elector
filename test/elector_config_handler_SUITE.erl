@@ -6,17 +6,16 @@
 
 -export([all/0, init_per_suite/1, end_per_suite/1]).
 -export([test_election_delay/1, test_strategy_module/1, test_pre_election_hooks/1,
-         test_post_election_hooks/1, test_startup_hooks_enabled/1, test_quorum_size/1,
-         test_quorum_check/1, test_candidate_node/1, test_hooks_execution/1,
-         test_automatic_elections/1, test_add_pre_election_hook/1, test_add_post_election_hook/1,
-         test_rem_pre_election_hook/1, test_rem_post_election_hook/1]).
+         test_post_election_hooks/1, test_quorum_size/1, test_quorum_check/1,
+         test_candidate_node/1, test_hooks_execution/1, test_automatic_elections/1,
+         test_add_pre_election_hook/1, test_add_post_election_hook/1, test_rem_pre_election_hook/1,
+         test_rem_post_election_hook/1]).
 
 all() ->
     [test_election_delay,
      test_strategy_module,
      test_pre_election_hooks,
      test_post_election_hooks,
-     test_startup_hooks_enabled,
      test_quorum_size,
      test_quorum_check,
      test_candidate_node,
@@ -35,7 +34,6 @@ end_per_suite(_Config) ->
     application:set_env(elector, election_delay, 1000),
     application:set_env(elector, strategy_module, elector_rt_high_strategy),
     application:set_env(elector, pre_election_hooks, []),
-    application:set_env(elector, startup_hooks_enabled, true),
     application:set_env(elector, post_election_hooks, []),
     application:set_env(elector, candidate_node, true),
     application:set_env(elector, hooks_execution, local),
@@ -80,10 +78,6 @@ test_post_election_hooks(_Config) ->
         end,
     Conds = Cond1 =:= true andalso Cond2 =:= true,
     true = Conds.
-
-test_startup_hooks_enabled(_Config) ->
-    application:set_env(elector, startup_hooks_enabled, false),
-    false = elector_config_handler:startup_hooks_enabled().
 
 test_quorum_size(_Config) ->
     application:set_env(elector, quorum_size, 5),

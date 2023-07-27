@@ -26,7 +26,6 @@ implementation. Available options are: `elector_rt_high_strategy` and `elector_r
 a list of tuples with the following format: `{Module, Function, Args}`. Default value is `[]`.
 `post_election_hooks` - A list of hooks/function calls that will be triggered exactly after the election process. Expects
 a list of tuples with the following format: `{Module, Function, Args}`. Default value is `[]`.
-- `startup_hooks_enabled`- If true the `pre_election_hooks` and - `post_election_hooks` will be triggered on startup. Default value is `true`.
 - `quorum_size` - The number of nodes(including the local node) that should be available in the cluster before the election process is started. Do not set it to `0` as it will disable the election process, leave empty or `1` if you want to run the election process even there are no other nodes in the cluster. Default value is `1`. 
 
 Keep in mind to use the same configuration for all nodes in the cluster!

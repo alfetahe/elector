@@ -13,9 +13,9 @@
 %% Exported API
 %%--------------------------------------------------------------------
 -export([election_delay/0, strategy_module/0, pre_election_hooks/0, post_election_hooks/0,
-         startup_hooks_enabled/0, quorum_size/0, quorum_check/0, candidate_node/0,
-         hooks_execution/0, automatic_elections/0, add_pre_election_hook/3,
-         add_post_election_hook/3, rem_pre_election_hook/3, rem_post_election_hook/3]).
+         quorum_size/0, quorum_check/0, candidate_node/0, hooks_execution/0, automatic_elections/0,
+         add_pre_election_hook/3, add_post_election_hook/3, rem_pre_election_hook/3,
+         rem_post_election_hook/3]).
 
 candidate_node() ->
     application:get_env(elector, candidate_node, true).
@@ -76,15 +76,6 @@ pre_election_hooks() ->
 -spec post_election_hooks() -> Hooks :: [{module(), function(), Args :: list()}].
 post_election_hooks() ->
     application:get_env(elector, post_election_hooks, []).
-
-%% @doc Returns the configured startup hooks enabled flag.
-%% When turned off the post or pre election hooks will not
-%% be executed on the startup.
-%% Default value is `true'.
-%% @end
--spec startup_hooks_enabled() -> StartupHooksEnabled :: boolean().
-startup_hooks_enabled() ->
-    application:get_env(elector, startup_hooks_enabled, true).
 
 %% @doc Returns the configured quorum size.
 %% This is the number of nodes that must be up and running
