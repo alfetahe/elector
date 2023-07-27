@@ -104,7 +104,8 @@ quorum_check() ->
         undefined ->
             true;
         _ ->
-            Quorum =< length([node() | nodes()])
+            Nodes = [node() | nodes()],
+            Quorum =< length(Nodes)
     end.
 
 %% private
