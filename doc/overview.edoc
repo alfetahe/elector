@@ -1,6 +1,6 @@
 @author Anuar Alfetahe <anuar.alfetahe@gmail.com>
 @copyright 2023 Anuar Alfetahe
-@version 0.2.2
+@version 0.3.0
 @title Elector
 @doc Elector is an Erlang application that automatically detects all nodes inside the distributed Erlang cluster and chooses the leader node.
 The elections are started automatically when the Elector application is started or when a node joins or leaves the cluster.
@@ -20,11 +20,11 @@ The default election strategy is to choose the node with the highest runtime.
 </ul>
 
 ==Installation for Elixir application==
-Add `{:elector, "~> 0.2.2"}` under the deps in the `mix.exs` file: 
+Add `{:elector, "~> 0.3.0"}` under the deps in the `mix.exs` file: 
 ```
     defp deps do
         [
-            {:elector, "~> 0.2.2"}
+            {:elector, "~> 0.3.0"}
         ]
     end
 '''
@@ -40,7 +40,7 @@ Next add `elector' under the extra_applications in the `mix.exs' file:
 '''
 
 ==Installation for Erlang application==
-Add `elector' to the deps in the `rebar.config' file: `{deps, [{elector, {"elector", "0.2.2"}]}.'
+Add `elector' to the deps in the `rebar.config' file: `{deps, [{elector, {"elector", "0.3.0"}]}.'
 Next add `elector` to the `applications` list in the `myapp.app.src' file: `{applications, [elector]}.'
 
 ==Examples==

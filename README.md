@@ -38,11 +38,11 @@ Keep in mind to use the same configuration for all nodes in the cluster!
 ## Guides
 
 ### Installation for Elixir application
-- Add `{:elector, "~> 0.2.2"}` under the deps in the `mix.exs` file: 
+- Add `{:elector, "~> 0.3.0"}` under the deps in the `mix.exs` file: 
 ```elixir
 defp deps do
     [
-        {:elector, "~> 0.2.2"}
+        {:elector, "~> 0.3.0"}
     ]
 end
 ```
@@ -57,7 +57,7 @@ end
 ```
 
 ### Installation for Erlang application
-- Add `elector` to the deps in the `rebar.config` file: `{deps, [{"elector", "0.2.2"}]}.`.
+- Add `elector` to the deps in the `rebar.config` file: `{deps, [{"elector", "0.3.0"}]}.`.
 - Add `elector` to the `applications` list in the `myapp.app.src` file: `{applications, [elector]}.`
 
 ## Examples
