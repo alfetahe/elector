@@ -1,4 +1,4 @@
--module(elector_wc_low_strategy_SUITE).
+-module(elector_ut_low_strategy_SUITE).
 
 -include_lib("common_test/include/ct.hrl").
 
@@ -21,6 +21,6 @@ test_elect(_Config) ->
     [erpc:call(Node, NodeSetupFun) || Node <- [node(), PeerNode]],
 
     CandidateNodes = elector_strategy_behaviour:candidate_nodes(),
-    SelectedNode = elector_wc_low_strategy:elect(CandidateNodes),
+    SelectedNode = elector_ut_low_strategy:elect(CandidateNodes),
     SelectedNode = PeerNode,
     peer:stop(Peer).

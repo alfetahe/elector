@@ -23,7 +23,7 @@ Elector also allows you to run pre- and post-election hooks that will be trigger
   <li>Automatic election process on startup or when node joins/leaves the cluster</li>
   <li>Ability to configure pre and post election hooks that will be called before and after the election process. 
   These hooks must return within 1 second to avoid timeouts.</li>
-  <li>Provides 2 built in election strategies and allows you to use your own strategy implementation</li>
+  <li>Provides 4 built in election strategies(based on time) and allows you to define your own strategy implementation</li>
   <li>Provides quorum option to detect split brain scenarios</li>
   <li>Provides option to define the election delay in milliseconds before the election process is started automatically and queue the election calls</li>
 </ul>
@@ -76,7 +76,6 @@ Next add <code>elector` to the `applications` list in the `myapp.app.src</code> 
 <h5><a name="Erlang">Erlang</a></h5>
 <pre>&gt; elector:get_leader().
 {ok, example_node}</pre>
-
 
 
 <p>See the <code>elector</code> module for more.</p>

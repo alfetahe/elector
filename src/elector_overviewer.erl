@@ -6,16 +6,28 @@
 %%%-----------------------------------------------------------------------------
 -module(elector_overviewer).
 
--behaviour(gen_server).
-
 -include("elector_header.hrl").
 
+%%------------------------------------------------------------------------------
+%% Behaviours
+%%------------------------------------------------------------------------------
+-behaviour(gen_server).
+
+%%------------------------------------------------------------------------------
+%% Exported API
+%%------------------------------------------------------------------------------
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, handle_continue/2]).
 
+%%------------------------------------------------------------------------------
+%% Exported functions
+%%------------------------------------------------------------------------------
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
+%%------------------------------------------------------------------------------
+%% Callback functions
+%%------------------------------------------------------------------------------
 init(_) ->
     {ok, [], {continue, setup}}.
 
@@ -50,9 +62,15 @@ handle_info({'DOWN', _MonitorRef, process, _Object, _Info}, State) ->
 handle_info(_, State) ->
     {noreply, State}.
 
+%%------------------------------------------------------------------------------
+%% Internal functions
+%%------------------------------------------------------------------------------
+
+%% @private
 monitor_manager() ->
     monitor(process, elector_service:commission_pid()).
 
+%% @private
 start_manager() ->
     case elector_commission:start() of
         {ok, _} ->
@@ -61,5 +79,6 @@ start_manager() ->
             ok
     end.
 
+%% @private
 commission_checkup() ->
     erlang:send_after(?COMMISSION_CHECKUP_INTERV, self(), commission_checkup).

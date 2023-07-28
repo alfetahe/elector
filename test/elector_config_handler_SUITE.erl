@@ -44,8 +44,8 @@ test_election_delay(_Config) ->
     5000 = elector_config_handler:election_delay().
 
 test_strategy_module(_Config) ->
-    application:set_env(elector, strategy_module, elector_wc_high_strategy),
-    elector_wc_high_strategy = elector_config_handler:strategy_module().
+    application:set_env(elector, strategy_module, elector_ut_high_strategy),
+    elector_ut_high_strategy = elector_config_handler:strategy_module().
 
 test_pre_election_hooks(_Config) ->
     application:set_env(elector, pre_election_hooks, elector_test_helper:test_hook(pre)),

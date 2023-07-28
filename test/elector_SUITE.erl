@@ -119,9 +119,9 @@ test_clear_leader(Config) ->
 config_setup() ->
     application:ensure_all_started(elector),
     application:set_env(elector, election_delay, 0),
-    application:set_env(elector, strategy_module, elector_wc_low_strategy).
+    application:set_env(elector, strategy_module, elector_ut_low_strategy).
 
 config_cleanup() ->
     application:set_env(elector, election_delay, 3000),
-    application:set_env(elector, strategy_module, elector_wc_high_strategy),
+    application:set_env(elector, strategy_module, elector_ut_high_strategy),
     application:set_env(elector, post_election_hooks, []).

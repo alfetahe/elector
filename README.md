@@ -7,12 +7,12 @@ Elector is an Erlang application that automatically detects all nodes inside the
 The elections are started automatically when the Elector application is started or when a node joins or leaves the cluster.
 Elector also allows you to run pre- and post-election hooks that will be triggered when the election process is started and finished.
 
-The default election strategy is to choose the node with the highest runtime.
+The default election strategy is to choose the node with the highest uptime.
 
 ## Features
 - Automatic election process on startup or when node joins/leaves the cluster
 - Ability to configure pre and post election hooks that will be called before and after the election process. <strong>These hooks must return within 1 second to avoid timeouts</strong>.
-- Provides 2 built in election strategies and allows you to use your own strategy implementation (See `elector_strategy_behaviour` module for reference`)
+- Provides 4 built in election strategies(time based) and allows you to define your own strategy implementation (See `elector_strategy_behaviour` module for reference`)
 - Provides quorum option to detect split brain scenarios
 - Provides option to define the election delay in milliseconds before the election process is started automatically and queue the
 election calls
@@ -98,6 +98,21 @@ end
 See the `elector` module for more.
 
 https://hexdocs.pm/elector/
+
+
+## High level overview
+Elector is a distributed application that utilizes the Erlang global module to spawn a singleton process named
+`elector_commission`. The commission process is responsible for starting the election process and keeping track of the nodes in the cluster.
+The election process is started by the commission process, which calls the `elect/1` function from the strategy module.
+This function gathers the necessary information from the cluster and decides which node should become the leader.
+
+Each node spawns the following local processes:
+- `elector_overviewer` process is responsible for starting the commission and monitor it across the cluster.
+- `elector_candidate` process holding the candidate information that describes if the node is a candidate for the leader election.
+- `elector_state` process holding the selected leader information.
+
+All processes are supervised by the `elector_sup` supervisor.
+
 
 ## Setup Elector locally
 

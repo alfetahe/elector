@@ -17,38 +17,58 @@
          add_pre_election_hook/3, add_post_election_hook/3, rem_pre_election_hook/3,
          rem_post_election_hook/3]).
 
+%% @doc Boolean value that indicates if the node is eligible to be a candidate for
+%% leader election.
+%% Default value is `1true'.
+%% @end
 candidate_node() ->
     application:get_env(elector, candidate_node, true).
 
+%% @doc Atom indicating if the triggered hook should be executed in the
+%% local node or in all nodes.
+%% Default value is `global'.
+%% @end
 hooks_execution() ->
     application:get_env(elector, hooks_execution, global).
 
+%% @doc Returns the configured boolean value that indicates if election
+%% should be triggered automatically when node joins or leaves the cluster.
+%% Default value is `true'.
+%% @end
 automatic_elections() ->
     application:get_env(elector, automatic_elections, true).
 
+%% @doc Adds new pre election hook.
+%% @end
 add_pre_election_hook(Module, Function, Args) ->
     application:set_env(elector,
                         pre_election_hooks,
                         [{Module, Function, Args} | pre_election_hooks()]).
 
+%% @doc Adds new post election hook.
+%% @end
 add_post_election_hook(Module, Function, Args) ->
     application:set_env(elector,
                         post_election_hooks,
                         [{Module, Function, Args} | post_election_hooks()]).
 
+%% @doc Removes pre election hook.
+%% @end
 rem_pre_election_hook(Module, Function, Args) ->
     application:set_env(elector,
                         pre_election_hooks,
                         remove_hook(Module, Function, Args, pre_election_hooks())).
 
+%% @doc Removes post election hook.
+%% @end
 rem_post_election_hook(Module, Function, Args) ->
     application:set_env(elector,
                         post_election_hooks,
                         remove_hook(Module, Function, Args, post_election_hooks())).
 
-%%--------------------------------------------------------------------
+%%------------------------------------------------------------------------------
 %% Exported functions
-%%--------------------------------------------------------------------
+%%------------------------------------------------------------------------------
 %% @doc Returns the configured election delay.
 %% Default value is `1000' (1 second).
 %% @end
@@ -99,6 +119,9 @@ quorum_check() ->
             Quorum =< length(Nodes)
     end.
 
+%%------------------------------------------------------------------------------
+%% Internal functions
+%%------------------------------------------------------------------------------
 %% private
 remove_hook(Module, Function, Args, Hooks) ->
     lists:filter(fun({M, F, A}) -> M =/= Module orelse F =/= Function orelse A =/= Args end,

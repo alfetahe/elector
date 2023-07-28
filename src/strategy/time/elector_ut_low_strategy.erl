@@ -1,11 +1,10 @@
 %%------------------------------------------------------------------------------
 %% @doc Runtime strategy that elects the node with the lowest
-%% runtime as leader.
-%% Runtime is based on CPU time used by the Erlang VM for each thread.
+%% uptime as leader.
 %% @private
 %% @end
 %%------------------------------------------------------------------------------
--module(elector_rt_low_strategy).
+-module(elector_ut_low_strategy).
 
 %%------------------------------------------------------------------------------
 %% Behaviours
@@ -23,4 +22,4 @@
 %% @doc Starts the election process.
 -spec elect(CandidateNodes :: [node()]) -> Leader :: elector_strategy_behaviour:leader().
 elect(CandidateNodes) ->
-    elector_time_strategy_base:elect(runtime, low, CandidateNodes).
+    elector_time_strategy_base:elect(wall_clock, low, CandidateNodes).

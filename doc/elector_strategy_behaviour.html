@@ -17,12 +17,16 @@
 <h2><a name="description">Description</a></h2>Defines the base behaviour for election strategies.
 <h2><a name="types">Data Types</a></h2>
 
+<h3 class="typedecl"><a name="type-candidate_nodes">candidate_nodes()</a></h3>
+<p><tt>candidate_nodes() = [node()]</tt></p>
+
+
 <h3 class="typedecl"><a name="type-leader">leader()</a></h3>
 <p><tt>leader() = node()</tt></p>
 
 
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#candidate_nodes-0">candidate_nodes/0</a></td><td></td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#candidate_nodes-0">candidate_nodes/0</a></td><td>Returns a list of nodes that are eligible to become the leader.</td></tr>
 <tr><td valign="top"><a href="#elect-0">elect/0</a></td><td>Starts the election process by triggering the strategy
   modules elect() function.</td></tr>
 </table>
@@ -31,9 +35,9 @@
 
 <h3 class="function"><a name="candidate_nodes-0">candidate_nodes/0</a></h3>
 <div class="spec">
-<p><tt>candidate_nodes() -&gt; any()</tt></p>
+<p><tt>candidate_nodes() -&gt; CandidateNodes::<a href="#type-candidate_nodes">candidate_nodes()</a></tt><br></p>
 <p> </p>
-</div>
+</div><p>Returns a list of nodes that are eligible to become the leader.</p>
 
 <h3 class="function"><a name="elect-0">elect/0</a></h3>
 <div class="spec">
