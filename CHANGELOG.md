@@ -1,5 +1,11 @@
 # Change log
 
+## v0.3.1 - 2025.11.XX
+
+### Changed:
+- `hooks_execution` - Default value changed from `global` to `local`. This means that by default, the pre and post election hooks will now be executed only on the node that initiates the election process. This change aims to reduce unnecessary execution of hooks on all nodes, which can be particularly beneficial in larger clusters where such operations might lead to increased load and potential performance issues.
+
+
 ## v0.3.0 - 2023.07.28
 The existing API functions did not change but the overall architecture did change meaning it
 is recommended to restart the elector application on all nodes after upgrading 
