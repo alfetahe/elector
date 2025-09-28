@@ -20,4 +20,5 @@ rebar3.crashdump
 erlang_ls.config
 test_logs/*
 .env
+doc/*
 TODO.md
