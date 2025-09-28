@@ -41,15 +41,29 @@ elect() ->
 %% @end
 -spec candidate_nodes() -> CandidateNodes :: candidate_nodes().
 candidate_nodes() ->
-    NodeCandidationFun =
-        fun() ->
-           Pid = erlang:whereis(elector_candidate),
-           case Pid of
-               undefined ->
-                   {ok, false};
-               _ ->
-                   gen_server:call(Pid, is_candidate_node)
-           end
+    Responses = elector_service:async_call(
+        fun elector_service:check_candidate_node/0,
+        [node() | nodes()]
+    ),
+    lists:foldl(
+        fun({Node, Response}, Acc) ->
+            case Response of
+                {response, {ok, true}} ->
+                    [Node | Acc];
+                {response, {ok, false}} ->
+                    Acc;
+                {response, {error, _Reason}} ->
+                    % Log error but don't include node in candidates
+                    Acc;
+                {error, {erpc, _Reason}} ->
+                    % Handle erpc errors (node down, timeout, etc.)
+                    % Log error but don't include node in candidates
+                    Acc;
+                _ ->
+                    % Handle any other unexpected responses
+                    Acc
+            end
         end,
-    Responses = elector_service:async_call(NodeCandidationFun, [node() | nodes()]),
-    [Node || {Node, {response, {ok, IsCandidate}}} <- Responses, IsCandidate =:= true].
+        [],
+        Responses
+    ).

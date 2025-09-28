@@ -10,7 +10,7 @@
 %%------------------------------------------------------------------------------
 %% Exported API
 %%------------------------------------------------------------------------------
--export([setup_election/1, hook_exec/3, commission_pid/0, async_call/2, iterate_hooks/2]).
+-export([setup_election/1, hook_exec/3, commission_pid/0, async_call/2, iterate_hooks/2, check_candidate_node/0]).
 
 %%------------------------------------------------------------------------------
 %% Exported functions
@@ -52,18 +52,21 @@ iterate_hooks([Mfa | Hooks], ExecuteHooks) when ExecuteHooks =:= true ->
 pre_election(#{run_hooks := ExecuteHooks} = _Opts) ->
     Nodes = election_hook_nodes(),
     Fun = fun() ->
-             elector_service:iterate_hooks(
-                 elector_config_handler:pre_election_hooks(), ExecuteHooks)
-          end,
+        elector_service:iterate_hooks(
+            elector_config_handler:pre_election_hooks(),
+            ExecuteHooks
+        )
+    end,
     async_call(Fun, Nodes).
 
 %% @private
 post_election(#{run_hooks := ExecuteHooks} = _Opts) ->
     Nodes = election_hook_nodes(),
     Fun = fun() ->
-             elector_service:iterate_hooks(
-                 elector_config_handler:post_election_hooks(), ExecuteHooks)
-          end,
+        elector_service:iterate_hooks(
+            elector_config_handler:post_election_hooks(), ExecuteHooks
+        )
+    end,
     async_call(Fun, Nodes).
 
 %% @private
@@ -73,4 +76,26 @@ election_hook_nodes() ->
             [node()];
         global ->
             [node() | nodes()]
+    end.
+
+%% @doc Checks if the current node is a candidate node.
+%% This function is designed to be called remotely via erpc.
+%% @end
+check_candidate_node() ->
+    try
+        Pid = erlang:whereis(elector_candidate),
+        case Pid of
+            undefined ->
+                {ok, false};
+            _ ->
+                case gen_server:call(Pid, is_candidate_node, 1000) of
+                    {ok, IsCandidate} ->
+                        {ok, IsCandidate};
+                    Error ->
+                        {error, Error}
+                end
+        end
+    catch
+        Class:Reason ->
+            {error, {Class, Reason}}
     end.
