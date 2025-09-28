@@ -1,9 +1,19 @@
 # Change log
 
-## v0.3.1 - 2025.11.XX
+## v0.3.1 - 2025.09.28
 
 ### Changed:
 - `hooks_execution` - Default value changed from `global` to `local`. This means that by default, the pre and post election hooks will now be executed only on the node that initiates the election process. This change aims to reduce unnecessary execution of hooks on all nodes, which can be particularly beneficial in larger clusters where such operations might lead to increased load and potential performance issues.
+
+### Fixed:
+- Fixed `:undef` error in `candidate_nodes/0` function by replacing anonymous function with named exported function for remote calls via `erpc`
+- Improved error handling in `candidate_nodes/0` to gracefully handle missing `elector_candidate` processes on remote nodes
+- Added proper timeout and try-catch blocks for better resilience in distributed scenarios
+
+### Improved:
+- Migrated documentation from edoc to hex docs for better user experience
+- Enhanced module and function documentation with better examples and formatting
+- Updated build system to use `rebar3 ex_doc` instead of `rebar3 edoc`
 
 
 ## v0.3.0 - 2023.07.28
