@@ -8,9 +8,11 @@ Minor updates and fixes.
 - Migrated from edoc to hex docs.
 
 ### Fixed:
-- Fixed `:undef` error in `candidate_nodes/0` function by using anonymous function with embedded logic instead of external function reference for better compatibility across nodes
-- Improved error handling in `candidate_nodes/0` to gracefully handle missing `elector_candidate` processes on remote nodes
-- Added proper timeout and try-catch blocks for better resilience in distributed scenarios
+- Fixed `:undef` and `:badarg` errors in `candidate_nodes/0` function by implementing robust anonymous function approach with comprehensive error handling
+- Added graceful handling for missing/unresponsive `elector_candidate` processes on remote nodes
+- Implemented shorter timeouts (500ms) and multiple fallback mechanisms for distributed test environments
+- Added comprehensive error pattern matching to handle all erpc error scenarios including node failures, function undefined, and communication timeouts
+- Improved resilience for frequent node start/stop scenarios in test environments
 
 ### Improved:
 - Migrated documentation from edoc to hex docs for better user experience

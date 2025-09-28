@@ -18,8 +18,17 @@
 commission_pid() ->
     global:whereis_name(elector_commission).
 
+%% @doc Executes a function or MFA tuple on multiple nodes asynchronously.
+%% @param Fun - Either a function or MFA tuple {Module, Function, Args}
+%% @param Nodes - List of nodes to execute on
+%% @end
 async_call(Fun, Nodes) ->
-    Refs = [{Node, erpc:send_request(Node, Fun)} || Node <- Nodes],
+    Refs = case Fun of
+        {Module, Function, Args} ->
+            [{Node, erpc:send_request(Node, Module, Function, Args)} || Node <- Nodes];
+        _ when is_function(Fun) ->
+            [{Node, erpc:send_request(Node, Fun)} || Node <- Nodes]
+    end,
     [{Node, erpc:wait_response(Ref, ?ERPC_TIMEOUT)} || {Node, Ref} <- Refs].
 
 setup_election(Opts) ->
@@ -77,4 +86,5 @@ election_hook_nodes() ->
         global ->
             [node() | nodes()]
     end.
+
 
