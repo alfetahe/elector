@@ -2,7 +2,6 @@
 %% @doc Module responsible for handling configuration.
 %% These settings can be altered with custom settings in the
 %% application environment.
-%% @private
 %% @end
 %%%-----------------------------------------------------------------------------
 -module(elector_config_handler).

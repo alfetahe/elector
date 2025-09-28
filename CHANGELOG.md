@@ -35,8 +35,8 @@ The selected node information will then be propagated to all other nodes in the 
 - `automatic_elections` configuration option which will allow us to disable the automatic election process started by the commission when node joins or leaves the cluster. Default value is `true`.
 - `elector_config_handler:add_pre_election_hook/3` - function to add new pre election hook.
 - `elector_config_handler:add_post_election_hook/3` - function to add new post election hook.
-- `elector_config_handler:remove_pre_election_hook/3` - function to remove pre election hook.
-- `elector_config_handler:remove_post_election_hook/3` - function to remove post election hook.
+- `elector_config_handler:rem_pre_election_hook/3` - function to remove pre election hook.
+- `elector_config_handler:rem_post_election_hook/3` - function to remove post election hook.
 - 2 new strategies that are based on node uptime.
 
 ### Removed
