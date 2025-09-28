@@ -21,6 +21,7 @@
     candidate_node/0,
     hooks_execution/0,
     automatic_elections/0,
+    candidate_cache_refresh_interval/0,
     add_pre_election_hook/3,
     add_post_election_hook/3,
     rem_pre_election_hook/3,
@@ -47,6 +48,13 @@ hooks_execution() ->
 %% @end
 automatic_elections() ->
     application:get_env(elector, automatic_elections, true).
+
+%% @doc Returns the candidate cache refresh interval in seconds.
+%% Set to 0 to disable periodic refresh (only on node join/leave events).
+%% Default value is `0' (disabled - only event-based updates).
+%% @end
+candidate_cache_refresh_interval() ->
+    application:get_env(elector, candidate_cache_refresh_interval, 0).
 
 %% @doc Adds new pre election hook.
 %% @end

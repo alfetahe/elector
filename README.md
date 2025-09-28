@@ -37,18 +37,20 @@ Elector supports the following configurations:
 
 - `automatic_elections` - Boolean indicating if the automatic election process should be started when node joins or leaves the cluster. Default value is `true`.
 
+- `candidate_cache_refresh_interval` - The interval in seconds for periodic candidate cache refresh. Set to `0` to disable periodic refresh (recommended - uses only event-based updates on node join/leave). Default value is `0`.
+
 Keep in mind to use the same configuration for all nodes in the cluster!
 
 ## Guides
 
 ### Installation for Elixir application
 
-1. Add `{:elector, "~> 0.3.1"}` under the deps in the `mix.exs` file:
+1. Add `{:elector, "~> 0.3.2"}` under the deps in the `mix.exs` file:
 
 ```elixir
 defp deps do
     [
-        {:elector, "~> 0.3.1"}
+        {:elector, "~> 0.3.2"}
     ]
 end
 ```
@@ -69,7 +71,7 @@ end
 1. Add `elector` to the deps in the `rebar.config` file:
 
 ```erlang
-{deps, [{"elector", "0.3.1"}]}.
+{deps, [{"elector", "0.3.2"}]}.
 ```
 
 2. Add `elector` to the `applications` list in the `myapp.app.src` file:

@@ -2,7 +2,7 @@
  elector,
  [{description,
    "Elects master node from Erlang/Elixir cluster that is agreed by all nodes."},
-  {vsn, "0.3.1"},
+  {vsn, "0.3.2"},
   {registered, []},
   {mod, {elector_app, []}},
   {applications, [kernel, stdlib]},

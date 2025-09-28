@@ -34,10 +34,11 @@ start_link() ->
 init([]) ->
     Candidate = #{id => elector_candidate, start => {elector_candidate, start_link, []}},
     ElectionState = #{id => elector_state, start => {elector_state, start_link, []}},
+    CandidateCache = #{id => elector_candidate_cache, start => {elector_candidate_cache, start_link, []}},
     CommissionOverviewer =
         #{id => elector_overviewer, start => {elector_overviewer, start_link, []}},
 
     SupFlags = #{strategy => one_for_all, intensity => 0, period => 1},
-    ChildSpecs = [Candidate, ElectionState, CommissionOverviewer],
+    ChildSpecs = [Candidate, ElectionState, CandidateCache, CommissionOverviewer],
 
     {ok, {SupFlags, ChildSpecs}}.

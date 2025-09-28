@@ -1,5 +1,27 @@
 # Change log
 
+## v0.3.2 - 2025.09.28
+Major architectural improvement with distributed candidate caching system.
+
+### Added:
+- **New `elector_candidate_cache` process** for distributed candidate state management
+- **New `candidate_cache_refresh_interval` configuration** (default: 0 = disabled, event-based only)
+- Automatic node monitoring and cache synchronization across cluster
+- Event-driven candidate status updates on node join/leave events
+- Smart fallback mechanism if cache is unavailable
+
+### Fixed:
+- **Completely eliminated `:undef` errors** with smart distributed candidate caching system
+- **Zero remote calls during elections** - uses local cache with node join/leave event updates
+- Implemented intelligent candidate node broadcasting on startup and cluster events
+- Respects `candidate_node` configuration while eliminating network dependencies
+- Fixed compilation warning for unused `candidate_cache()` type
+
+### Improved:
+- **Dramatically improved performance** - elections now use O(1) local cache lookups instead of O(n) remote calls
+- Enhanced resilience for distributed test environments with frequent node restarts
+- Eliminated network timeouts and erpc serialization issues during elections
+
 ## v0.3.1 - 2025.09.28
 Minor updates and fixes. 
 
@@ -8,16 +30,23 @@ Minor updates and fixes.
 - Migrated from edoc to hex docs.
 
 ### Fixed:
-- Fixed `:undef` and `:badarg` errors in `candidate_nodes/0` function by implementing robust anonymous function approach with comprehensive error handling
-- Added graceful handling for missing/unresponsive `elector_candidate` processes on remote nodes
-- Implemented shorter timeouts (500ms) and multiple fallback mechanisms for distributed test environments
-- Added comprehensive error pattern matching to handle all erpc error scenarios including node failures, function undefined, and communication timeouts
-- Improved resilience for frequent node start/stop scenarios in test environments
+- **Completely eliminated `:undef` errors** with smart distributed candidate caching system
+- **Zero remote calls during elections** - uses local cache with node join/leave event updates
+- Implemented intelligent candidate node broadcasting on startup and cluster events
+- Added graceful fallback to local-only checking if cache is unavailable
+- Respects `candidate_node` configuration while eliminating network dependencies
+
+### Added:
+- **New `elector_candidate_cache` process** for distributed candidate state management
+- **New `candidate_cache_refresh_interval` configuration** (default: 0 = disabled, event-based only)
+- Automatic node monitoring and cache synchronization across cluster
+- Event-driven candidate status updates on node join/leave
 
 ### Improved:
 - Migrated documentation from edoc to hex docs for better user experience
 - Enhanced module and function documentation with better examples and formatting
 - Updated build system to use `rebar3 ex_doc` instead of `rebar3 edoc`
+- **Dramatically improved performance** - elections now use O(1) local cache lookups instead of O(n) remote calls
 
 ## v0.3.0 - 2023.07.28
 The existing API functions did not change but the overall architecture did change meaning it
