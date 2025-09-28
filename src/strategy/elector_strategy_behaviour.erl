@@ -41,10 +41,26 @@ elect() ->
 %% @end
 -spec candidate_nodes() -> CandidateNodes :: candidate_nodes().
 candidate_nodes() ->
-    Responses = elector_service:async_call(
-        fun elector_service:check_candidate_node/0,
-        [node() | nodes()]
-    ),
+    CheckFun = fun() ->
+        try
+            Pid = erlang:whereis(elector_candidate),
+            case Pid of
+                undefined ->
+                    {ok, false};
+                _ ->
+                    case gen_server:call(Pid, is_candidate_node, 1000) of
+                        {ok, IsCandidate} ->
+                            {ok, IsCandidate};
+                        Error ->
+                            {error, Error}
+                    end
+            end
+        catch
+            Class:Reason ->
+                {error, {Class, Reason}}
+        end
+    end,
+    Responses = elector_service:async_call(CheckFun, [node() | nodes()]),
     lists:foldl(
         fun({Node, Response}, Acc) ->
             case Response of
