@@ -9,7 +9,7 @@
 %%------------------------------------------------------------------------------
 %% Exported API
 %%------------------------------------------------------------------------------
--export([elect/3]).
+-export([elect/3, candidate_data/1]).
 
 %%------------------------------------------------------------------------------
 %% Exported functions
@@ -21,7 +21,7 @@
                Leader :: elector_strategy_behaviour:leader().
 elect(TimeType, Direction, CandidateNodes) ->
     CandidateRefs =
-        [{Node, erpc:send_request(Node, fun() -> candidate_data(TimeType) end)}
+        [{Node, erpc:send_request(Node, ?MODULE, candidate_data, [TimeType])}
          || Node <- CandidateNodes],
     CandiateResps = [{Node, erpc:receive_response(Ref)} || {Node, Ref} <- CandidateRefs],
     selected_leader(CandiateResps, Direction).

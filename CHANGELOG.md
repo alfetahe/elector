@@ -12,6 +12,7 @@ Major architectural improvement with distributed candidate caching system.
 
 ### Fixed:
 - **Completely eliminated `:undef` errors** with smart distributed candidate caching system
+- **Fixed `:undef` errors in election strategies** - replaced anonymous functions with MFA tuples in `elector_time_strategy_base`
 - **Zero remote calls during elections** - uses local cache with node join/leave event updates
 - Implemented intelligent candidate node broadcasting on startup and cluster events
 - Respects `candidate_node` configuration while eliminating network dependencies
